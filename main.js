@@ -1169,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     const optionControls = document.querySelectorAll('[data-option-controls]');
-    let secondCodeActivators = new Map();
+    let secondCodeActivatorsMap = new Map();
 
     optionControls.forEach(controlGroup => {
       const curOptionWithActivator = controlGroup.querySelectorAll('[data-option-btn][data-second-code-activator]');
@@ -1179,7 +1179,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const key = option.dataset.secondCodeActivator;
           const value = option.id.slice(2);
 
-          secondCodeActivators.set(key, value);
+          secondCodeActivatorsMap.set(key, value);
         }
       });
 
@@ -1269,13 +1269,36 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    secondCodeActivators.forEach((value, key) => {
-      const matchingOptions = document.querySelectorAll(`[data-option-btn][data-is-option]`);
+    secondCodeActivatorsMap.forEach((value, key) => {
+      const matchingOptions = document.querySelectorAll('[data-option-btn][data-is-option]');
 
       matchingOptions.forEach(option => {
         if (option.id && option.id.includes(key)) {
           option.dataset.secondCodeActivatorParent = value;
         }
+      });
+    });
+
+    const secondCodeActivatorParents = document.querySelectorAll('[data-option-btn][data-second-code-activator-parent]');
+
+    secondCodeActivatorParents.forEach(parent => {
+      parent.addEventListener('click', () => {
+        const parentKey = parent.id.slice(2);
+        const matchingOptions = Array.from(document.querySelectorAll('[data-option-btn][data-second-code-activator]'))
+          .filter(el => el.dataset.secondCodeActivator === parentKey);
+
+        matchingOptions.forEach(option => {
+          if (option.id.startsWith('e_')) {
+            const field = summaryForm.querySelector(`[name="${option.dataset.codeFieldName}"]`);
+            if (field) {
+              if (parent.id.startsWith('e_')) {
+                field.value = option.dataset.valueSecond;
+              } else if (parent.id.startsWith('d_')) {
+                field.value = option.dataset.value;
+              }
+            }
+          }
+        });
       });
     });
   }
@@ -1290,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', () => {
   =               Countries Select              =
   =============================================*/
 
-  fetch('https://s3.us-east-1.amazonaws.com/assets.vvmd.team/Grand3d/countries.gz.json')
+  fetch('https://grandboats3d.github.io/frontend-files/countries.json')
     .then(response => {
       if (!response.ok) throw new Error('Network response was not ok');
       return response.json();
@@ -1417,17 +1440,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const initialColorsAndOptions = JSON.parse(sessionStorage.getItem('initialColorsAndOptions') || '[]');
 
       if (Array.isArray(initialColorsAndOptions)) {
-        console.log('-----------------------');
         initialColorsAndOptions.forEach((value, index) => {
           const btn = document.querySelector(`[data-option-btn][id="d_${value}"]`);
           if (btn) {
-            console.log('btn[' + (index + 1) + ']: ', btn);
-            console.log('');
-
             btn.click();
           }
         });
-        console.log('-----------------------');
       }
     }
   }
