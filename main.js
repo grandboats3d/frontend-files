@@ -624,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const iframe = document.querySelector('.model_component');
 
   function waitForAppLoaded(iframeWindow) {
-    const timeoutDuration = 0.08 * 60 * 1000; // 1 min 0,08 замінити на 1
+    const timeoutDuration = 0.01 * 60 * 1000; // 1 min 0,01 замінити на 1
 
     return new Promise((resolve) => {
       const interval = setInterval(() => {
@@ -1519,5 +1519,33 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /*=====      End of Form Submit        ======*/
+
+
+
+  // Disabling features before click
+  let skipNextClick = false;
+  const checkFeaturesElements = document.querySelectorAll('#screenshot_mobile, #screenshot_desktop, #form-open-modal-btn');
+
+  checkFeaturesElements.forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (skipNextClick) {
+        skipNextClick = false;
+        return;
+      }
+
+      const toggleFeaturesBtn = document.getElementById('e_toggle_features');
+
+      if (toggleFeaturesBtn) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        toggleFeaturesBtn.click();
+        skipNextClick = true;
+        setTimeout(() => {
+          el.click();
+        }, 100);
+      }
+    });
+  });
 
 });
