@@ -624,7 +624,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const iframe = document.querySelector('.model_component');
 
   function waitForAppLoaded(iframeWindow) {
-    const timeoutDuration = 0.01 * 60 * 1000; // 1 min 0,01 замінити на 1
+    const isWebflow = window.location.href.includes('webflow.io');
+    const timeoutMinutes = isWebflow ? 0.01 : 1;
+    const timeoutDuration = timeoutMinutes * 60 * 1000; 
 
     return new Promise((resolve) => {
       const interval = setInterval(() => {
@@ -857,6 +859,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
               }
             });
+          } else if (currentId.startsWith('d_')) {
+            const relatedParentId = btn.dataset.related;
+
+            const sameRelatedBtns = Array.from(document.querySelectorAll('[data-is-option][data-related]'))
+              .filter(el => el.dataset.related === relatedParentId);
+
+            if (sameRelatedBtns.length > 0 && sameRelatedBtns.every(el => el.id.startsWith('d_'))) {
+              const parentBtn = document.querySelector(`[data-related-parent][id*="${relatedParentId}"]`);
+              if (parentBtn && parentBtn.id.startsWith('e_')) {
+                parentBtn.click();
+              }
+            }
           }
         }
 
@@ -1170,16 +1184,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const optionControls = document.querySelectorAll('[data-option-controls]');
     let secondCodeActivatorsMap = new Map();
+    let relatedOptionsMap = new Map();
 
     optionControls.forEach(controlGroup => {
-      const curOptionWithActivator = controlGroup.querySelectorAll('[data-option-btn][data-second-code-activator]');
+      const curOptionWithActivators = controlGroup.querySelectorAll('[data-option-btn][data-second-code-activator]');
 
-      curOptionWithActivator.forEach(option => {
+      curOptionWithActivators.forEach(option => {
         if (option.id && option.dataset.secondCodeActivator) {
           const key = option.dataset.secondCodeActivator;
           const value = option.id.slice(2);
 
           secondCodeActivatorsMap.set(key, value);
+        }
+      });
+
+      const relatedOptions = controlGroup.querySelectorAll('[data-option-btn][data-related]');
+
+      relatedOptions.forEach(option => {
+        if (option.id && option.dataset.related) {
+          const key = option.dataset.related;
+          const value = option.id.slice(2);
+
+          if (!relatedOptionsMap.has(key)) {
+            relatedOptionsMap.set(key, []);
+          }
+
+          relatedOptionsMap.get(key).push(value);
         }
       });
 
@@ -1269,9 +1299,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    
     secondCodeActivatorsMap.forEach((value, key) => {
       const matchingOptions = document.querySelectorAll('[data-option-btn][data-is-option]');
-
+      
       matchingOptions.forEach(option => {
         if (option.id && option.id.includes(key)) {
           option.dataset.secondCodeActivatorParent = value;
@@ -1299,6 +1330,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
         });
+      });
+    });
+
+
+    relatedOptionsMap.forEach((value, key) => {
+      const matchingOptions = document.querySelectorAll('[data-option-btn][data-is-option]');
+
+      matchingOptions.forEach(option => {
+        if (option.id && option.id.includes(key)) {
+          option.dataset.relatedParent = value.join(', ');
+        }
+      });
+    });
+
+    const relatedOptionParents = document.querySelectorAll('[data-option-btn][data-related-parent]');
+
+    relatedOptionParents.forEach(parent => {
+      parent.addEventListener('click', () => {
+        const parentId = parent.id;
+        const parentKey = parentId.slice(2);
+        const matchingOptions = Array.from(document.querySelectorAll('[data-option-btn][data-related]'))
+          .filter(el => el.dataset.related === parentKey);
+
+        if (parentId.startsWith('d_')) {
+          matchingOptions.forEach(option => {
+            if (option.id.startsWith('e_')) {
+              option.click();
+            }
+          });
+        }
       });
     });
   }
