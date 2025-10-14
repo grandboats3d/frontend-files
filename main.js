@@ -794,6 +794,74 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     });
+
+
+    const relatedOptionsButtons = colorButtons.filter(btn => btn.dataset.relatedOptions);
+    let relatedToColorOptionsMap = new Map();
+
+    relatedOptionsButtons.forEach(colorBtn => {
+      if (colorBtn.id && colorBtn.dataset.relatedOptions) {
+        const key = colorBtn.dataset.relatedOptions;
+        const value = colorBtn.id.slice(2);
+
+        if (!relatedToColorOptionsMap.has(key)) {
+          relatedToColorOptionsMap.set(key, []);
+        }
+
+        relatedToColorOptionsMap.get(key).push(value);
+      }
+    });
+
+    relatedToColorOptionsMap.forEach((value, key) => {
+      const allOptions = document.querySelectorAll('[data-option-btn][data-is-option]');
+
+      allOptions.forEach(option => {
+        if (option.id && option.id.includes(key)) {
+          option.dataset.relatedToColorParent = value.join(', ');
+        }
+      });
+    });
+
+
+    const relatedToColorOptionParents = document.querySelectorAll('[data-option-btn][data-related-to-color-parent]');
+
+    relatedToColorOptionParents.forEach(parent => {
+      parent.addEventListener('click', () => {
+        const parentId = parent.id;
+        const parentKey = parentId.slice(2);
+        const relatedColorsIds = parent.dataset.relatedToColorParent;
+        const firstRelatedColorId = relatedColorsIds.split(',')[0].trim();
+        const buttonToClick = document.querySelector(`[data-option-btn][data-related-options][id*="${firstRelatedColorId}"]`);
+        const matchingRelatedColorOptions = Array.from(document.querySelectorAll('[data-option-btn][data-related-options]'))
+          .filter(el => el.dataset.relatedOptions === parentKey);
+
+        if (parentId.startsWith('d_')) {
+          matchingRelatedColorOptions.forEach(colorOption => {
+            if (colorOption.id.startsWith('e_')) {
+              const currentId = colorOption.id;
+              const currentUrlParam = colorOption.dataset.fieldName;
+              const url = new URL(window.location.href);
+              const params = url.searchParams;
+
+              colorOption.id = currentId.replace(/^e_/, 'd_');
+              colorOption.classList.remove('is-active');
+
+              if (params.has(currentUrlParam)) {
+                params.delete(currentUrlParam);
+                url.search = params.toString();
+                window.history.replaceState({}, '', url.toString());
+              }
+            }
+          });
+        } else if (parentId.startsWith('e_')) {
+          const allIdsStartWithD = matchingRelatedColorOptions.every(el => el.id.startsWith('d_'));
+          if (buttonToClick && allIdsStartWithD) {
+            console.log('🚀 ~ buttonToClick:', buttonToClick)
+            buttonToClick.click();
+          }
+        }
+      });
+    });
   }
 
 
