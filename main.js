@@ -842,6 +842,9 @@ document.addEventListener('DOMContentLoaded', () => {
               const currentUrlParam = colorOption.dataset.fieldName;
               const url = new URL(window.location.href);
               const params = url.searchParams;
+              const fieldInForm = summaryForm.querySelector(`[name="${currentUrlParam}"]`);
+
+              fieldInForm.value = '';
 
               colorOption.id = currentId.replace(/^e_/, 'd_');
               colorOption.classList.remove('is-active');
@@ -856,7 +859,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (parentId.startsWith('e_')) {
           const allIdsStartWithD = matchingRelatedColorOptions.every(el => el.id.startsWith('d_'));
           if (buttonToClick && allIdsStartWithD) {
-            console.log('🚀 ~ buttonToClick:', buttonToClick)
             buttonToClick.click();
           }
         }
