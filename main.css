@@ -114,6 +114,7 @@
 
   .options_color-btn.is-active {
     border-color: var(--_colors---brand--main);
+    pointer-events: none;
   }
 
   .options_color-btn.is-disabled .options_color-btn_colors {

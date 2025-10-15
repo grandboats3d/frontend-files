@@ -837,7 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (parentId.startsWith('d_')) {
           matchingRelatedColorOptions.forEach(colorOption => {
-            if (colorOption.id.startsWith('e_')) {
+            if (colorOption.classList.contains('is-active')) {
               const currentId = colorOption.id;
               const currentUrlParam = colorOption.dataset.fieldName;
               const url = new URL(window.location.href);
@@ -846,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               fieldInForm.value = '';
 
-              colorOption.id = currentId.replace(/^e_/, 'd_');
+              colorOption.id = colorOption.id = 'd_' + currentId.slice(2);
               colorOption.classList.remove('is-active');
 
               if (params.has(currentUrlParam)) {
