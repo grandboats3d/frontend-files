@@ -429,17 +429,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /*----------  Add Options  ----------*/
     const options = boatData.options || [];
-
     const optionsFragment = document.createDocumentFragment();
     const optionsNavFragment = document.createDocumentFragment();
 
-    const countTab1 = boatData['options-count-tab-1'] || 9;
-    const countTab2 = boatData['options-count-tab-2'] || 9;
     const defaultGroupSize = 9;
+    const countTab1 = boatData['options-count-tab-1'] || defaultGroupSize;
+    const countTab2 = boatData['options-count-tab-2'] || defaultGroupSize;
+    const countTab3 = boatData['options-count-tab-3'] || defaultGroupSize;
 
     let currentControls;
-    let groupCount = 0;
     let item;
+    let groupCount = 0;
     let processedCount = 0;
 
     options.forEach((option, index) => {
@@ -460,14 +460,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const codeFieldName = `option-${index + 1}`;
       addHiddenInput(summaryForm, codeFieldName);
 
-      let groupSize;
-      if (groupCount === 0) {
-        groupSize = countTab1;
-      } else if (groupCount === 1) {
-        groupSize = countTab2;
-      } else {
-        groupSize = defaultGroupSize;
-      }
+      const groupSize =
+        groupCount === 0 ? countTab1 :
+        groupCount === 1 ? countTab2 :
+        groupCount === 2 ? countTab3 :
+        defaultGroupSize;
 
       if (processedCount === 0) {
         item = document.createElement('div');
@@ -497,8 +494,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="nav_btn_line"></span>
           `;
         optionsNavFragment.appendChild(button);
-
-        groupCount++;
       }
 
       const mainBtn = document.createElement('button');
@@ -597,8 +592,10 @@ document.addEventListener('DOMContentLoaded', () => {
       currentControls.appendChild(controlsGroup);
 
       processedCount++;
+
       if (processedCount === groupSize) {
         processedCount = 0;
+        groupCount++;
       }
     });
 
