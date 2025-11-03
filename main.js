@@ -100,11 +100,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
-        const data = JSON.parse(cached);
-        return data;
+        const cachedData = JSON.parse(cached);
+
+        if (cachedData?.id === boatId) {
+          return cachedData;
+        } else {
+          sessionStorage.removeItem(cacheKey);
+          sessionStorage.removeItem('initialColorsAndOptions');
+        }
       } catch {
-        // If cache is corrupted, remove it
         sessionStorage.removeItem(cacheKey);
+        sessionStorage.removeItem('initialColorsAndOptions');
       }
     }
 
@@ -1369,10 +1375,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    
+
     secondCodeActivatorsMap.forEach((value, key) => {
       const matchingOptions = document.querySelectorAll('[data-option-btn][data-is-option]');
-      
+
       matchingOptions.forEach(option => {
         if (option.id && option.id.includes(key)) {
           option.dataset.secondCodeActivatorParent = value;
