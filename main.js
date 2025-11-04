@@ -463,9 +463,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const groupSize =
         groupCount === 0 ? countTab1 :
-        groupCount === 1 ? countTab2 :
-        groupCount === 2 ? countTab3 :
-        defaultGroupSize;
+          groupCount === 1 ? countTab2 :
+            groupCount === 2 ? countTab3 :
+              defaultGroupSize;
 
       if (processedCount === 0) {
         item = document.createElement('div');
@@ -629,8 +629,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function waitForAppLoaded(iframeWindow) {
     const isWebflow = window.location.href.includes('webflow.io');
-    const timeoutMinutes = isWebflow ? 0.01 : 1;
-    const timeoutDuration = timeoutMinutes * 60 * 1000; 
+    const timeoutMinutes = isWebflow ? 0.01 : 0.5;
+    const timeoutDuration = timeoutMinutes * 60 * 1000;
 
     return new Promise((resolve) => {
       const interval = setInterval(() => {
@@ -656,16 +656,20 @@ document.addEventListener('DOMContentLoaded', () => {
   iframe.onload = () => {
     const iframeWindow = iframe.contentWindow;
     waitForAppLoaded(iframeWindow).then(msg => {
-      applyInitialState();
-      const elements = document.querySelectorAll('#features-toggle, #actions-component, #options-component');
+      setTimeout(function () {
+        applyInitialState();
 
-      elements.forEach(element => {
-        element.classList.remove('is-hidden');
-      });
+        const elements = document.querySelectorAll('#features-toggle, #actions-component, #options-component');
 
-      updateCurrentOptionsStyles();
+        elements.forEach(element => {
+          element.classList.remove('is-hidden');
+        });
 
-      console.log(msg);
+        updateCurrentOptionsStyles();
+
+        console.log(msg);
+
+      }, 500);
     });
   };
 
