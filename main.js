@@ -937,18 +937,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
               }
             });
-          } else if (currentId.startsWith('d_')) {
-            const relatedParentId = btn.dataset.related;
-
-            const sameRelatedBtns = Array.from(document.querySelectorAll('[data-is-option][data-related]'))
-              .filter(el => el.dataset.related === relatedParentId);
-
-            if (sameRelatedBtns.length > 0 && sameRelatedBtns.every(el => el.id.startsWith('d_'))) {
-              const parentBtn = document.querySelector(`[data-related-parent][id*="${relatedParentId}"]`);
-              if (parentBtn && parentBtn.id.startsWith('e_')) {
-                parentBtn.click();
-              }
-            }
           }
         }
 
