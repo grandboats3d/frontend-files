@@ -159,6 +159,13 @@
     cursor: default;
   }
 
+
+  @media screen and (max-width: 390px) {
+    .options_controls.is-grid {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    }
+  }
+
   /*=====         End of Options         ======*/
 
 

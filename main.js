@@ -337,9 +337,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const total = colorsArray.length;
-      const remainder = total % 6;
+      const divisor = window.innerWidth < 390 ? 5 : 6;
+      const remainder = total % divisor;
       if (remainder !== 0) {
-        const fillersNeeded = 6 - remainder;
+        const fillersNeeded = divisor - remainder;
         for (let i = 0; i < fillersNeeded; i++) {
           const filler = document.createElement('div');
           filler.className = 'options_color-btn is-empty';
