@@ -632,6 +632,8 @@ document.addEventListener('DOMContentLoaded', () => {
   =            3D Model Loading Check           =
   =============================================*/
 
+  const iframe = document.querySelector('.model_component');
+
   function waitForAppLoaded(iframeWindow) {
     const isWebflow = window.location.href.includes('webflow.io');
     const timeoutMinutes = isWebflow ? 0.01 : 0.5;
@@ -658,8 +660,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  modelIframe.onload = () => {
-    const iframeWindow = modelIframe.contentWindow;
+  iframe.onload = () => {
+    const iframeWindow = iframe.contentWindow;
     waitForAppLoaded(iframeWindow).then(msg => {
       setTimeout(function () {
         applyInitialState();
