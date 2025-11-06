@@ -609,12 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navComponent.insertBefore(optionsNavFragment, navComponent.lastElementChild);
     optionItems.insertBefore(optionsFragment, optionItems.lastElementChild);
-
-
-
-    /*----------  Run Global Functions  ----------*/
-
-    globalFuncs();
+    
   }
 
   if (!document.body.hasAttribute('data-no-fetch')) {
@@ -631,51 +626,53 @@ document.addEventListener('DOMContentLoaded', () => {
   /*=============================================
   =            3D Model Loading Check           =
   =============================================*/
+
   const isWebflow = window.location.href.includes('webflow.io');
   const timeoutMinutes = isWebflow ? 0.01 : 0.5;
   const timeoutDuration = timeoutMinutes * 60 * 1000;
   const addsDelay = 500;
 
   function waitForAppLoaded(iframeWindow) {
-
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         try {
           if (iframeWindow.is3DLoaded === true) {
             clearInterval(interval);
-            resolve('3D is loaded!');
+            resolve(true);
           }
-        } catch (e) {
-        }
+        } catch (e) { }
       }, 1500);
 
       setTimeout(() => {
         clearInterval(interval);
-        resolve('Timeout waiting for 3D to load');
+        resolve(false);
       }, timeoutDuration);
     });
   }
 
   function handleIframeLoad() {
-    const iframeWindow = modelIframe.contentWindow;
+    const iframeWindow = modelIframe?.contentWindow;
     if (!iframeWindow) return;
 
-    waitForAppLoaded(iframeWindow).then(msg => {
+    waitForAppLoaded(iframeWindow).then(isLoaded => {
+      if (!isLoaded) {
+        console.warn('3D did not load — UI will remain hidden');
+        return;
+      }
+
       setTimeout(() => {
+        globalFuncs();
         applyInitialState();
 
         document.querySelectorAll('#features-toggle, #actions-component, #options-component')
           .forEach(el => el.classList.remove('is-hidden'));
 
         updateCurrentOptionsStyles();
-
-        console.log(msg);
       }, addsDelay);
     });
   }
 
   if (modelIframe) {
-    // If iframe already loaded (cache or opening in a new tab)
     if (modelIframe.contentDocument?.readyState === 'complete') {
       handleIframeLoad();
     } else {
