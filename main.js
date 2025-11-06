@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageWrapper = document.querySelector('#page-wrapper');
   const navComponent = pageWrapper.querySelector('#nav-component');
   const headerNav = pageWrapper.querySelector('#header-nav');
+  const modelIframe = pageWrapper.querySelector('#model-iframe');
 
   const prevOptionBtn = pageWrapper.querySelector('#options-prev-btn');
   const nextOptionBtn = pageWrapper.querySelector('#options-next-btn');
@@ -146,6 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const boatData = data;
+
+    
+    /*----------  Iframe SRC  ----------*/
+    if (modelIframe) {
+      modelIframe.src = `${data.slug}.html`;
+    }
 
 
     /*----------  Initial options  ----------*/
