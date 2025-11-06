@@ -609,7 +609,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navComponent.insertBefore(optionsNavFragment, navComponent.lastElementChild);
     optionItems.insertBefore(optionsFragment, optionItems.lastElementChild);
-    
+
+
+
+    /*----------  Run Global Functions  ----------*/
+
+    globalFuncs();
   }
 
   if (!document.body.hasAttribute('data-no-fetch')) {
@@ -627,58 +632,52 @@ document.addEventListener('DOMContentLoaded', () => {
   =            3D Model Loading Check           =
   =============================================*/
 
-  const isWebflow = window.location.href.includes('webflow.io');
-  const timeoutMinutes = isWebflow ? 0.01 : 0.5;
-  const timeoutDuration = timeoutMinutes * 60 * 1000;
-  const addsDelay = 500;
-
   function waitForAppLoaded(iframeWindow) {
+    const isWebflow = window.location.href.includes('webflow.io');
+    const timeoutMinutes = isWebflow ? 0.01 : 0.5;
+    const timeoutDuration = timeoutMinutes * 60 * 1000;
+
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         try {
           if (iframeWindow.is3DLoaded === true) {
             clearInterval(interval);
-            resolve(true);
+            resolve('3D is loaded!');
+          } else {
+            console.log('Loading Check');
           }
-        } catch (e) { }
-      }, 1500);
+        } catch (e) {
+          console.log('Cannot access is3DLoaded (cross-origin)');
+        }
+      }, 2000);
 
       setTimeout(() => {
         clearInterval(interval);
-        resolve(false);
+        resolve('Timeout waiting for 3D to load');
       }, timeoutDuration);
     });
   }
 
-  function handleIframeLoad() {
-    const iframeWindow = modelIframe?.contentWindow;
-    if (!iframeWindow) return;
-
-    waitForAppLoaded(iframeWindow).then(isLoaded => {
-      if (!isLoaded) {
-        console.warn('3D did not load — UI will remain hidden');
-        return;
-      }
-
-      setTimeout(() => {
-        globalFuncs();
+  modelIframe.onload = () => {
+    const iframeWindow = modelIframe.contentWindow;
+    waitForAppLoaded(iframeWindow).then(msg => {
+      setTimeout(function () {
         applyInitialState();
 
-        document.querySelectorAll('#features-toggle, #actions-component, #options-component')
-          .forEach(el => el.classList.remove('is-hidden'));
+        const elements = document.querySelectorAll('#features-toggle, #actions-component, #options-component');
+
+        elements.forEach(element => {
+          element.classList.remove('is-hidden');
+        });
 
         updateCurrentOptionsStyles();
-      }, addsDelay);
-    });
-  }
 
-  if (modelIframe) {
-    if (modelIframe.contentDocument?.readyState === 'complete') {
-      handleIframeLoad();
-    } else {
-      modelIframe.addEventListener('load', handleIframeLoad, { once: true });
-    }
-  }
+        console.log(msg);
+
+      }, 500);
+    });
+  };
+
 
   /*=====  End of 3D Model Loading Check ======*/
 
