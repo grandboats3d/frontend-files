@@ -633,6 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
   =============================================*/
 
   const iframe = document.querySelector('.model_component');
+  let applied = false;
 
   function waitForAppLoaded(iframeWindow) {
     const isWebflow = window.location.href.includes('webflow.io');
@@ -680,6 +681,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !applied) {
+      applyInitialState();
+      applied = true;
+    }
+  });
 
   /*=====  End of 3D Model Loading Check ======*/
 
