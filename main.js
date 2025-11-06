@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   =          Global Elements/Functions          =
   =============================================*/
 
-  const apiUrl = ' https://grand3d-backend-production.up.railway.app/api';
+  const apiUrl = 'https://grand3d-backend-production.up.railway.app/api';
 
   const urlParams = new URLSearchParams(window.location.search);
   const boatId = urlParams.get('id');
@@ -631,13 +631,12 @@ document.addEventListener('DOMContentLoaded', () => {
   /*=============================================
   =            3D Model Loading Check           =
   =============================================*/
-
-  const iframe = document.querySelector('.model_component');
+  const isWebflow = window.location.href.includes('webflow.io');
+  const timeoutMinutes = isWebflow ? 0.01 : 0.5;
+  const timeoutDuration = timeoutMinutes * 60 * 1000;
+  const addsDelay = 500;
 
   function waitForAppLoaded(iframeWindow) {
-    const isWebflow = window.location.href.includes('webflow.io');
-    const timeoutMinutes = isWebflow ? 0.01 : 0.5;
-    const timeoutDuration = timeoutMinutes * 60 * 1000;
 
     return new Promise((resolve) => {
       const interval = setInterval(() => {
@@ -645,13 +644,10 @@ document.addEventListener('DOMContentLoaded', () => {
           if (iframeWindow.is3DLoaded === true) {
             clearInterval(interval);
             resolve('3D is loaded!');
-          } else {
-            console.log('Loading Check');
           }
         } catch (e) {
-          console.log('Cannot access is3DLoaded (cross-origin)');
         }
-      }, 2000);
+      }, 1500);
 
       setTimeout(() => {
         clearInterval(interval);
@@ -660,26 +656,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  iframe.onload = () => {
-    const iframeWindow = iframe.contentWindow;
+  function handleIframeLoad() {
+    const iframeWindow = modelIframe.contentWindow;
+    if (!iframeWindow) return;
+
     waitForAppLoaded(iframeWindow).then(msg => {
-      setTimeout(function () {
+      setTimeout(() => {
         applyInitialState();
 
-        const elements = document.querySelectorAll('#features-toggle, #actions-component, #options-component');
-
-        elements.forEach(element => {
-          element.classList.remove('is-hidden');
-        });
+        document.querySelectorAll('#features-toggle, #actions-component, #options-component')
+          .forEach(el => el.classList.remove('is-hidden'));
 
         updateCurrentOptionsStyles();
 
         console.log(msg);
-
-      }, 500);
+      }, addsDelay);
     });
-  };
+  }
 
+  if (modelIframe) {
+    // If iframe already loaded (cache or opening in a new tab)
+    if (modelIframe.contentDocument?.readyState === 'complete') {
+      handleIframeLoad();
+    } else {
+      modelIframe.addEventListener('load', handleIframeLoad, { once: true });
+    }
+  }
 
   /*=====  End of 3D Model Loading Check ======*/
 
