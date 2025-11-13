@@ -190,6 +190,104 @@
   =============================================*/
 
   @media screen and (max-width: 1140px) {
+    body {
+      --header--height: 2.875rem;
+      --container--default: 100%;
+      --horizontal-spaser--default: .75rem;
+      --global--side-gap: max(calc((100vw - var(--container--default) + 2 * var(--horizontal-spaser--default)) / 2), var(--horizontal-spaser--default));
+      --nav--top: calc(var(--header--height) + .75rem);
+      --popup--padding: 2rem;
+      --_colors---options--hover: var(--_colors---options--bg);
+      --_colors---options--active-hover: var(--_colors---brand--main);
+    }
+
+    .header_component {
+      color: var(--_colors---text--main);
+    }
+
+    .header_content {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .header_btn {
+      width: var(--header--height);
+      height: var(--header--height);
+      padding: 0px var(--horizontal-spaser--default);
+      background-color: #0000;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+
+    .brand_component {
+      width: 8.75rem;
+    }
+
+    .header_btn {
+      width: var(--header--height);
+      height: var(--header--height);
+      padding: 0px var(--horizontal-spaser--default);
+      background-color: #0000;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+
+    .header_nav {
+      opacity: 0;
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+      background-color: #00000059;
+      flex-flow: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      display: none;
+      position: fixed;
+      top: 0%;
+      left: 0%;
+    }
+
+
+    .nav_component {
+      display: none;
+    }
+
+        .header_nav_link {
+        z-index: var(--_z-index---level--2);
+        background-color: var(--_colors---button--background);
+        text-align: center;
+        text-transform: none;
+        justify-content: center;
+        align-items: center;
+        min-width: 15.3125rem;
+        height: 2.5rem;
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+        margin-left: 0;
+        font-size: .75rem;
+        font-weight: 600;
+        display: flex;
+        position: relative;
+    }
+
+        .header_nav_link.is-tablet {
+        display: flex;
+    }
+
+    .header_nav_overlay {
+        z-index: var(--_z-index---level--1);
+        width: 100%;
+        height: 100%;
+        display: block;
+        position: absolute;
+        top: 0%;
+        left: 0%;
+    }
+
+
     .actions_component {
       flex-flow: column;
       justify-content: flex-end;
