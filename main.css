@@ -362,7 +362,8 @@
     height: 1.875rem;
   }
 
-  .options_color-btn.is-empty {
+  .options_color-btn.is-empty,
+  .actions_component {
     display: none;
   }
 
