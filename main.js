@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const boatData = data;
 
-    
+
     /*----------  Iframe SRC  ----------*/
     if (modelIframe) {
       modelIframe.src = `${data.slug}.html`;
@@ -377,6 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
           item.classList.add('is-active');
         }
 
+        let wrapper;
+
         if (title) {
           const h2 = document.createElement('h2');
           h2.className = 'options_title is-main';
@@ -399,30 +401,34 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
           colorNavFragment.appendChild(button);
+
+          wrapper = document.createElement('div');
+          wrapper.className = 'options_controls_wrapper';
+          item.appendChild(wrapper);
         }
 
         if (subTitleOne) {
           const h3 = document.createElement('h3');
           h3.className = 'options_title';
           h3.textContent = subTitleOne;
-          item.appendChild(h3);
+          wrapper.appendChild(h3);
         }
 
         if (Array.isArray(colorsOne) && colorsOne.length > 0) {
           const controls = renderColorControls(colorsOne, groupNameOne, index + 1, 1);
-          item.appendChild(controls);
+          wrapper.appendChild(controls);
         }
 
         if (subTitleTwo) {
           const h3 = document.createElement('h3');
           h3.className = 'options_title';
           h3.textContent = subTitleTwo;
-          item.appendChild(h3);
+          wrapper.appendChild(h3);
         }
 
         if (Array.isArray(colorsTwo) && colorsTwo.length > 0) {
           const controls = renderColorControls(colorsTwo, groupNameTwo, index + 1, 2);
-          item.appendChild(controls);
+          wrapper.appendChild(controls);
         }
 
         colorOptionsFragment.appendChild(item);
@@ -485,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.appendChild(h2);
 
         currentControls = document.createElement('div');
-        currentControls.classList.add('options_controls');
+        currentControls.className = 'options_controls is-options';
         currentControls.dataset.optionControls = '';
         currentControls.dataset.multiple = '';
         item.appendChild(currentControls);
