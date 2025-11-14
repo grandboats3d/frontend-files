@@ -340,6 +340,11 @@
 
 
   .options_component {
+    --group-height: calc(5.5 * (.125rem + 1.875rem));
+    /* gap + item height */
+    --group-max-height: calc(90svh - var(--header--height) - 2 * 2.5rem);
+    /* options title and footer height */
+
     right: var(--global--side-gap);
     transform: translate(0%);
     max-width: var(--menu-max-width);
@@ -348,7 +353,7 @@
   .options_controls.is-options,
   .options_controls_wrapper {
     overflow: auto;
-    max-height: calc(5.5 * (.125rem + 1.875rem));
+    max-height: min(var(--group-height), var(--group-max-height));
     /* gap + item height */
   }
 
