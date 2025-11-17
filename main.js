@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateOptionsStyles(target) {
     const allMobileQuery = window.matchMedia('(max-width: 767px)');
+    const isLandscapeSmall = window.matchMedia('(orientation: landscape) and (max-height: 600px)');
 
     if (optionsComponent && target) {
       if (allMobileQuery.matches) {
@@ -80,6 +81,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     }
+
+    if (modelIframe && target) {
+      if (isLandscapeSmall.matches) {
+        gsap.to(modelIframe, {
+          '--menu-max-width': '40%'
+        });
+      } else {
+        gsap.to(modelIframe, {
+          '--menu-max-width': '0%'
+        });
+      }
+    }
+
+    console.log('🚀 ~ modelIframe && target:', modelIframe && target)
+    console.log('🚀 ~ isLandscapeSmall.matches:', isLandscapeSmall.matches)
   }
 
   function updateCurrentOptionsStyles() {
@@ -1069,6 +1085,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (toggleHideMenu.classList.contains('is-active')) {
         gsap.to(optionsComponent, {
           '--_options---padding--top': '0px'
+        });
+        gsap.to(modelIframe, {
+          '--menu-max-width': '0%'
         });
       } else {
         updateCurrentOptionsStyles();
