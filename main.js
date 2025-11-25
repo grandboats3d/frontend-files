@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const allMobileQuery = window.matchMedia('(max-width: 767px)');
 
   function globalFuncs() {
+    getBoatOptionsCodes();
     init3dActionIds();
     handleNavBtnClicks();
     handleOptions();
@@ -93,14 +94,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     }
-
-    console.log('🚀 ~ modelIframe && target:', modelIframe && target)
-    console.log('🚀 ~ isLandscapeSmall.matches:', isLandscapeSmall.matches)
   }
 
   function updateCurrentOptionsStyles() {
     const current = document.querySelector('[data-options-item].is-active');
     if (current) updateOptionsStyles(current);
+  }
+
+
+  function applyBoatCodes(options) {
+    if (!options) return;
+
+    const optionButtons = document.querySelectorAll('[data-option-btn][data-is-option]');
+
+    optionButtons.forEach(el => {
+      let id = el.id || '';
+
+      if (id.startsWith('d_') || id.startsWith('e_')) {
+        id = id.slice(2);
+      }
+
+      const optionKey = (el.innerText || el.textContent || '').trim();
+
+      const match = options[id];
+      if (!match) return;
+
+      if (match.code) {
+        el.dataset.code = match.code;
+        el.dataset.value = `${optionKey} (${match.code})`;
+      }
+
+      if (match.code_second) {
+        el.dataset.codeSecond = match.code_second;
+        el.dataset.valueSecond = `${optionKey} (${match.code_second})`;
+      }
+    });
   }
 
   /*===  End of Global Elements/Functions  ====*/
@@ -164,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const boatData = data;
 
+    document.body.dataset.boatId = data.name;
 
     /*----------  Iframe SRC  ----------*/
     if (modelIframe) {
@@ -476,8 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const {
         title,
         'button-id': buttonId,
-        'option-code': optionCode,
-        'option-code-second': optionCodeSecond,
         'image-2d': image2d,
         'has-3d': has3d,
         'filter-colors': filterColors,
@@ -533,13 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
       mainBtn.dataset.optionBtn = '';
       mainBtn.dataset.isOption = '';
       mainBtn.dataset['3dAction'] = '';
-      mainBtn.dataset.code = optionCode;
-      mainBtn.dataset.value = `${title} (${optionCode})`;
-
-      if (optionCodeSecond) {
-        mainBtn.dataset.codeSecond = optionCodeSecond;
-        mainBtn.dataset.valueSecond = `${title} (${optionCodeSecond})`;
-      }
 
       mainBtn.dataset.codeFieldName = codeFieldName;
       mainBtn.textContent = title;
@@ -715,6 +735,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+  /*=============================================
+  =              Boat Options Codes             =
+  =============================================*/
+
+  function getBoatOptionsCodes() {
+    const storageKey = 'boatOptionsCodes';
+    const boatIdRaw = document.body.dataset.boatId;
+
+    if (!boatIdRaw) {
+      console.warn('data-boat-id not found on body');
+      return Promise.resolve(null);
+    }
+
+    const boatId = boatIdRaw.trim().toLowerCase();
+    const cachedData = sessionStorage.getItem(storageKey);
+
+    if (cachedData) {
+      const parsed = JSON.parse(cachedData);
+      applyBoatCodes(parsed[boatId] || null);
+      return Promise.resolve(parsed[boatId] || null);
+    }
+
+    return fetch('https://grandboats3d.github.io/frontend-files/boat-options-codes.json')
+      .then(res => res.json())
+      .then(data => {
+        sessionStorage.setItem(storageKey, JSON.stringify(data));
+        applyBoatCodes(data[boatId] || null);
+        return data[boatId] || null;
+      })
+      .catch(err => {
+        console.error('Error loading boat options:', err);
+        return null;
+      });
+  }
+
+  /*=====    End of Boat Options Codes   ======*/
 
 
 
