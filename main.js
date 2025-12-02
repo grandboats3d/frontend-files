@@ -777,6 +777,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function ensureInitialState() {
         if (!applied) {
             applyInitialState();
+
+            const elements = document.querySelectorAll(
+                "#features-toggle, #actions-component, #options-component",
+            );
+
+            elements.forEach((element) => {
+                element.classList.remove("is-hidden");
+            });
+
+            updateCurrentOptionsStyles();
+
             applied = true;
         }
     }
@@ -787,15 +798,6 @@ document.addEventListener("DOMContentLoaded", () => {
         waitForAppLoaded(iframeWindow).then((msg) => {
             setTimeout(() => {
                 ensureInitialState();
-
-                const elements = document.querySelectorAll(
-                    "#features-toggle, #actions-component, #options-component",
-                );
-                elements.forEach((element) => {
-                    element.classList.remove("is-hidden");
-                });
-
-                updateCurrentOptionsStyles();
                 console.log(msg);
             }, 500);
         });
@@ -805,8 +807,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!document.hidden) {
             applied = false;
             ensureInitialState();
-        } else {
-            applied = false;
         }
     });
 
@@ -814,7 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!applied && document.visibilityState === "visible") {
             ensureInitialState();
         }
-    }, 3000);
+    }, 1500);
 
     /*=====  End of 3D Model Loading Check ======*/
 
