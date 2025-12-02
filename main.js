@@ -750,7 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function waitForAppLoaded(iframeWindow) {
         const isWebflow = window.location.href.includes("webflow.io");
-        const timeoutMinutes = isWebflow ? 0.01 : 0.5;
+        const timeoutMinutes = isWebflow ? 0.01 : 1;
         const timeoutDuration = timeoutMinutes * 60 * 1000;
 
         return new Promise((resolve) => {
@@ -774,31 +774,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function ensureInitialState() {
+        if (!applied) {
+            applyInitialState();
+            applied = true;
+        }
+    }
+
     iframe.onload = () => {
         const iframeWindow = iframe.contentWindow;
         waitForAppLoaded(iframeWindow).then((msg) => {
-            setTimeout(function () {
-                applyInitialState();
+            setTimeout(() => {
+                ensureInitialState();
 
                 const elements = document.querySelectorAll(
                     "#features-toggle, #actions-component, #options-component",
                 );
-
                 elements.forEach((element) => {
                     element.classList.remove("is-hidden");
                 });
 
                 updateCurrentOptionsStyles();
-
                 console.log(msg);
             }, 500);
         });
     };
 
     document.addEventListener("visibilitychange", () => {
-        if (!document.hidden && !applied) {
-            applyInitialState();
-            applied = true;
+        if (!document.hidden) {
+            ensureInitialState();
         }
     });
 
