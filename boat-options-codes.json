@@ -148,7 +148,6 @@
     "towing_mast": { "code": "2515" },
     "el_pack": {
       "code": "2707",
-      "code_second": "2707"
     },
     "prem_wheel": { "code": "2282" },
     "bow_sundeck": { "code": "2318" },
@@ -169,7 +168,6 @@
     "handrail_windshield": { "code": "225001" },
     "el_pack": {
       "code": "2707",
-      "code_second": "2707"
     },
     "canvas_bimini_top": { "code": "2391" },
     "overall_cover": { "code": "282401" },
@@ -189,7 +187,6 @@
     "handrail_windshield": { "code": "225001" },
     "el_pack": {
       "code": "2707",
-      "code_second": "2707"
     },
     "canvas_bimini_top": { "code": "2390" },
     "rigid_hard_top": { "code": "258201" },
