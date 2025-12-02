@@ -782,6 +782,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     iframe.onload = () => {
+        applied = false;
         const iframeWindow = iframe.contentWindow;
         waitForAppLoaded(iframeWindow).then((msg) => {
             setTimeout(() => {
@@ -802,9 +803,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener("visibilitychange", () => {
         if (!document.hidden) {
+            applied = false;
             ensureInitialState();
+        } else {
+            applied = false;
         }
     });
+
+    setInterval(() => {
+        if (!applied && document.visibilityState === "visible") {
+            ensureInitialState();
+        }
+    }, 3000);
 
     /*=====  End of 3D Model Loading Check ======*/
 
