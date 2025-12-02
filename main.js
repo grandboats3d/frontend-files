@@ -746,7 +746,9 @@ document.addEventListener("DOMContentLoaded", () => {
     =============================================*/
 
     const iframe = document.querySelector(".model_component");
-    let applied = false;
+    const hiddenUIElements = document.querySelectorAll(
+        "#features-toggle, #actions-component, #options-component",
+    );
 
     function waitForAppLoaded(iframeWindow) {
         const isWebflow = window.location.href.includes("webflow.io");
@@ -754,10 +756,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const timeoutDuration = timeoutMinutes * 60 * 1000;
 
         return new Promise((resolve) => {
+            console.log("waitForAppLoaded started");
             const interval = setInterval(() => {
                 try {
                     if (iframeWindow.is3DLoaded === true) {
                         clearInterval(interval);
+                        console.log("3D loaded detected");
                         resolve("3D is loaded!");
                     } else {
                         console.log("Loading Check");
@@ -769,52 +773,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
             setTimeout(() => {
                 clearInterval(interval);
+                console.log("waitForAppLoaded timeout reached");
                 resolve("Timeout waiting for 3D to load");
             }, timeoutDuration);
         });
     }
 
     function ensureInitialState() {
-        if (!applied) {
-            applyInitialState();
+        console.log("Applying initial state");
+        applyInitialState();
 
-            const elements = document.querySelectorAll(
-                "#features-toggle, #actions-component, #options-component",
-            );
+        console.log("Found elements:", hiddenUIElements.length);
+        hiddenUIElements.forEach((element) => {
+            element.classList.remove("is-hidden");
+        });
 
-            elements.forEach((element) => {
-                element.classList.remove("is-hidden");
-            });
+        updateCurrentOptionsStyles();
+    }
 
-            updateCurrentOptionsStyles();
+    function checkUIElements() {
+        const hasHiddenElements = Array.from(hiddenUIElements).some((element) =>
+            element.classList.contains("is-hidden"),
+        );
 
-            applied = true;
+        console.log("Check UI elements, has hidden:", hasHiddenElements);
+
+        if (hasHiddenElements) {
+            console.log("Found hidden elements, re-applying initial state");
+            ensureInitialState();
         }
     }
 
     iframe.onload = () => {
-        applied = false;
+        console.log("iframe.onload triggered");
         const iframeWindow = iframe.contentWindow;
         waitForAppLoaded(iframeWindow).then((msg) => {
+            console.log("waitForAppLoaded resolved:", msg);
             setTimeout(() => {
                 ensureInitialState();
+
+                setTimeout(() => {
+                    checkUIElements();
+                }, 2000);
+
                 console.log(msg);
             }, 500);
         });
     };
-
-    document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) {
-            applied = false;
-            ensureInitialState();
-        }
-    });
-
-    setInterval(() => {
-        if (!applied && document.visibilityState === "visible") {
-            ensureInitialState();
-        }
-    }, 1500);
 
     /*=====  End of 3D Model Loading Check ======*/
 
