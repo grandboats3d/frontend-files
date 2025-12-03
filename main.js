@@ -446,25 +446,19 @@ document.addEventListener("DOMContentLoaded", () => {
             ) => {
                 const title = boatData[titleKey];
                 const subTitleOne = boatData[subTitleOneKey];
-                const groupNameOne =
-                    subTitleOne !== undefined
-                        ? title + " | " + subTitleOne
-                        : title;
                 const colorsOne = boatData[colorsOneKey];
                 const subTitleTwo = boatData[subTitleTwoKey];
                 const colorsTwo = boatData[colorsTwoKey];
-                const groupNameTwo =
-                    subTitleTwo !== undefined
-                        ? title + " | " + subTitleTwo
-                        : "";
 
-                if (
+                // Точна перевірка наявності контенту для групи
+                const hasContent =
                     title ||
-                    subTitleOne ||
-                    Array.isArray(colorsOne) ||
-                    subTitleTwo ||
-                    Array.isArray(colorsTwo)
-                ) {
+                    (subTitleOne && subTitleOne.trim()) ||
+                    (Array.isArray(colorsOne) && colorsOne.length > 0) ||
+                    (subTitleTwo && subTitleTwo.trim()) ||
+                    (Array.isArray(colorsTwo) && colorsTwo.length > 0);
+
+                if (hasContent) {
                     const item = document.createElement("div");
                     item.dataset.optionsItem = "";
                     item.className = "options_item";
@@ -491,10 +485,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         button.innerHTML = `
-              <span class="nav_btn_caption-visible">${title}</span>
-              <span class="nav_btn_caption-base">${title}</span>
-              <span class="nav_btn_line"></span>
-            `;
+                            <span class="nav_btn_caption-visible">${title}</span>
+                            <span class="nav_btn_caption-base">${title}</span>
+                            <span class="nav_btn_line"></span>
+                        `;
 
                         colorNavFragment.appendChild(button);
 
@@ -511,6 +505,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     if (Array.isArray(colorsOne) && colorsOne.length > 0) {
+                        const groupNameOne = subTitleOne
+                            ? title + " | " + subTitleOne
+                            : title;
                         const controls = renderColorControls(
                             colorsOne,
                             groupNameOne,
@@ -528,6 +525,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     if (Array.isArray(colorsTwo) && colorsTwo.length > 0) {
+                        const groupNameTwo = subTitleTwo
+                            ? title + " | " + subTitleTwo
+                            : "";
                         const controls = renderColorControls(
                             colorsTwo,
                             groupNameTwo,
