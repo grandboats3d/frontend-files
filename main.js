@@ -820,7 +820,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    const CHECK_DELAY = 3000;
+    const CHECK_DELAY = 5000;
     const MAX_CHECK_DURATION = 30000;
 
     setTimeout(() => {
