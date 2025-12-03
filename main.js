@@ -833,6 +833,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }, MAX_CHECK_DURATION);
     }, CHECK_DELAY);
 
+    let checkOnFocus = false;
+    window.addEventListener("focus", () => {
+        console.log("Window got focus!");
+        if (!checkOnFocus) {
+            applyInitialState();
+            checkOnFocus = true;
+        }
+    });
+
     /*=====  End of 3D Model Loading Check ======*/
 
     /*=============================================
