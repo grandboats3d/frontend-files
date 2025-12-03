@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateCurrentOptionsStyles();
     }
 
-    function checkUIElements() {
+    function checkUIElements(_interval) {
         const hasHiddenElements = Array.from(hiddenUIElements).some((element) =>
             element.classList.contains("is-hidden"),
         );
@@ -801,6 +801,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (hasHiddenElements) {
             console.log("Found hidden elements, re-applying initial state");
             ensureInitialState();
+        } else if (_interval) {
+            clearInterval(_interval);
+            console.log("All UI elements are visible, stopped checks");
         }
     }
 
@@ -812,14 +815,23 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 ensureInitialState();
 
-                setTimeout(() => {
-                    checkUIElements();
-                }, 2000);
-
                 console.log(msg);
             }, 500);
         });
     };
+
+    const CHECK_DELAY = 3000;
+    const MAX_CHECK_DURATION = 30000;
+
+    setTimeout(() => {
+        const interval = setInterval(() => {
+            checkUIElements(interval);
+        }, CHECK_DELAY);
+
+        setTimeout(() => {
+            clearInterval(interval);
+        }, MAX_CHECK_DURATION);
+    }, CHECK_DELAY);
 
     /*=====  End of 3D Model Loading Check ======*/
 
