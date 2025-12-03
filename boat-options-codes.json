@@ -147,7 +147,7 @@
     "inbuilt_fuel_system": { "code": "2602" },
     "towing_mast": { "code": "2515" },
     "el_pack": {
-      "code": "2707",
+      "code": "2707"
     },
     "prem_wheel": { "code": "2282" },
     "bow_sundeck": { "code": "2318" },
@@ -167,7 +167,7 @@
     "towing_mast": { "code": "2515" },
     "handrail_windshield": { "code": "225001" },
     "el_pack": {
-      "code": "2707",
+      "code": "2707"
     },
     "canvas_bimini_top": { "code": "2391" },
     "overall_cover": { "code": "282401" },
@@ -186,7 +186,7 @@
     "towing_mast": { "code": "2515" },
     "handrail_windshield": { "code": "225001" },
     "el_pack": {
-      "code": "2707",
+      "code": "2707"
     },
     "canvas_bimini_top": { "code": "2390" },
     "rigid_hard_top": { "code": "258201" },
@@ -205,7 +205,7 @@
     "waterski_mast_handrails": { "code": "2543" },
     "el_pack": {
       "code": "2705",
-      "code_second": "2706",
+      "code_second": "2706"
     },
 
     "hydraulic_sys": { "code": "2271" },
@@ -234,7 +234,7 @@
     "waterski_mast_handrails": { "code": "2543" },
     "el_pack": {
       "code": "2705",
-      "code_second": "2706",
+      "code_second": "2706"
     },
     "hydraulic_sys": { "code": "2271" },
     "mech_wheel": { "code": "225601" },
@@ -260,7 +260,7 @@
     "waterski_mast_handrails": { "code": "2543" },
     "el_pack": {
       "code": "2705",
-      "code_second": "2706",
+      "code_second": "2706"
     },
 
     "hydraulic_sys": { "code": "2271" },
@@ -274,7 +274,7 @@
     "keel_protector_package": { "code": "2969" },
     "tube_protector_package": { "code": "2970" },
     "overpressure_valves": { "code": "414601" }
-  },
+  }
 
 
 }
