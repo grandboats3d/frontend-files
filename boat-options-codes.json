@@ -196,5 +196,85 @@
     "keel_protector_package": { "code": "2917" },
     "tube_protector_package": { "code": "2918" },
     "overpressure_valves": { "code": "4146" }
-  }
+  },
+
+  
+  "d600l": {
+    "swimming_platforms": { "code": "2438" },
+    "bowrailing": { "code": "2553" },
+    "waterski_mast_handrails": { "code": "2543" },
+    "el_pack": {
+      "code": "2705",
+      "code_second": "2706",
+    },
+
+    "hydraulic_sys": { "code": "2271" },
+    "mech_wheel": { "code": "225601" },
+    "prem_wheel": { "code": "2282" },
+    "bow_sundeck": { "code": "2656" },
+    "rear_sundeck": { "code": "2653" },
+    "freshwater_set_shower": { "code": "2736" },
+    "canvas_ttop": { "code": "2547" },
+    "bow_sun_top": { "code": "280002" },
+    "rear_sun_top": { "code": "280003" },
+    "overall_cover": { "code": "2800" },
+    "console_cover": { "code": "2995" },
+    "double_seat_cover": { "code": "2996" },
+    "harbour_cover": { "code": "299501" },
+    "seadek_soft_anti_skid": { "code": "3516" },
+    "keel_protector_package": { "code": "2969" },
+    "tube_protector_package": { "code": "2970" },
+    "overpressure_valves": { "code": "414601" }
+  },
+
+
+  "d600a": {
+    "swimming_platforms": { "code": "2438" },
+    "bowrailing": { "code": "2553" },
+    "waterski_mast_handrails": { "code": "2543" },
+    "el_pack": {
+      "code": "2705",
+      "code_second": "2706",
+    },
+    "hydraulic_sys": { "code": "2271" },
+    "mech_wheel": { "code": "225601" },
+    "prem_wheel": { "code": "2282" },
+    "bow_sundeck": { "code": "2656" },
+    "freshwater_set_shower": { "code": "2736" },
+    "canvas_ttop": { "code": "2547" },
+    "bow_sun_top": { "code": "280002" },
+    "rear_sun_top": { "code": "280003" },
+    "overall_cover": { "code": "2800" },
+    "console_cover": { "code": "2995" },
+    "sports_seats_cover": { "code": "299601" },
+    "harbour_cover": { "code": "299501" },
+    "seadek_soft_anti_skid": { "code": "351601" },
+    "keel_protector_package": { "code": "2969" },
+    "tube_protector_package": { "code": "2970" },
+    "overpressure_valves": { "code": "414601" }
+  },
+
+  "d600d": {
+    "swimming_platforms": { "code": "2438" },
+    "bowrailing": { "code": "2553" },
+    "waterski_mast_handrails": { "code": "2543" },
+    "el_pack": {
+      "code": "2705",
+      "code_second": "2706",
+    },
+
+    "hydraulic_sys": { "code": "2271" },
+    "mech_wheel": { "code": "225601" },
+    "prem_wheel": { "code": "2282" },
+    "freshwater_set_shower": { "code": "2736" },
+    "canvas_ttop": { "code": "2547" },
+    "overall_cover": { "code": "28001" },
+    "jockey_seats_cover": { "code": "299603" },
+    "harbour_cover": { "code": "299602" },
+    "keel_protector_package": { "code": "2969" },
+    "tube_protector_package": { "code": "2970" },
+    "overpressure_valves": { "code": "414601" }
+  },
+
+
 }
