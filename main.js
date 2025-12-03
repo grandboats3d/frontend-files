@@ -1897,7 +1897,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (key === "options") {
                     value.split("-").forEach((opt) => {
                         const btn = document.querySelector(
-                            `[data-option-btn][data-code="${opt}"]`,
+                            `[data-option-btn][data-code="${opt}"][id^="d_"]`,
                         );
                         if (btn) {
                             btn.click();
@@ -1905,7 +1905,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 } else {
                     const btn = document.querySelector(
-                        `[data-field-name="${key}"][data-value="${value}"]`,
+                        `[data-field-name="${key}"][data-value="${value}"][id^="d_"]`,
                     );
                     if (btn) {
                         btn.click();
