@@ -791,22 +791,6 @@ document.addEventListener("DOMContentLoaded", () => {
         updateCurrentOptionsStyles();
     }
 
-    function checkUIElements(_interval) {
-        const hasHiddenElements = Array.from(hiddenUIElements).some((element) =>
-            element.classList.contains("is-hidden"),
-        );
-
-        console.log("Check UI elements, has hidden:", hasHiddenElements);
-
-        if (hasHiddenElements) {
-            console.log("Found hidden elements, re-applying initial state");
-            ensureInitialState();
-        } else if (_interval) {
-            clearInterval(_interval);
-            console.log("All UI elements are visible, stopped checks");
-        }
-    }
-
     iframe.onload = () => {
         console.log("iframe.onload triggered");
         const iframeWindow = iframe.contentWindow;
@@ -821,21 +805,21 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const CHECK_DELAY = 5000;
-    const MAX_CHECK_DURATION = 30000;
+    const MAX_CHECK_DURATION = 15000;
 
     setTimeout(() => {
         const interval = setInterval(() => {
-            checkUIElements(interval);
+            ensureInitialState();
         }, CHECK_DELAY);
 
         setTimeout(() => {
-            clearInterval(interval);
+            ensureInitialState();
         }, MAX_CHECK_DURATION);
     }, CHECK_DELAY);
 
     window.addEventListener("focus", () => {
         console.log("Window got focus!");
-        applyInitialState();
+        ensureInitialState();
     });
 
     /*=====  End of 3D Model Loading Check ======*/
