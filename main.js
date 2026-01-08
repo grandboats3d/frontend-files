@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     =          Global Elements/Functions          =
     =============================================*/
 
-  const apiUrl = "https://grandboats.ucibt.com/api";
+  const apiUrl = "https://js.grandboats.com/api";
 
   const urlParams = new URLSearchParams(window.location.search);
   const boatId = urlParams.get("id");
