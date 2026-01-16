@@ -708,6 +708,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /*----------  Run Global Functions  ----------*/
 
     globalFuncs();
+    check3DModelLoading();
   }
 
   if (!document.body.hasAttribute("data-no-fetch")) {
@@ -719,84 +720,94 @@ document.addEventListener("DOMContentLoaded", () => {
   /*=============================================
   =            3D Model Loading Check           =
   =============================================*/
+  function check3DModelLoading() {
+    const iframe = document.querySelector(".model_component");
+    if (!iframe) {
+      console.warn("iframe not found");
+      return;
+    }
 
-  const iframe = document.querySelector(".model_component");
-  const hiddenUIElements = document.querySelectorAll(
-    "#features-toggle, #actions-component, #options-component",
-  );
+    const hiddenUIElements = document.querySelectorAll(
+      "#features-toggle, #actions-component, #options-component",
+    );
 
-  let hasInitialized = false;
+    let hasInitialized = false;
+    let has3DLoaded = false;
 
-  function waitForAppLoaded(iframeWindow) {
-    const isWebflow = window.location.href.includes("webflow.io");
-    const timeoutMinutes = isWebflow ? 0.01 : 1;
-    const timeoutDuration = timeoutMinutes * 60 * 1000;
+    function waitForAppLoaded() {
+      if (has3DLoaded) {
+        console.log("3D already loaded, skipping wait");
+        return Promise.resolve("3D is already loaded");
+      }
 
-    return new Promise((resolve) => {
-      console.log("waitForAppLoaded started");
-      const interval = setInterval(() => {
-        try {
-          if (iframeWindow.is3DLoaded === true) {
-            clearInterval(interval);
-            console.log("3D loaded detected");
+      const isWebflow = window.location.href.includes("webflow.io");
+      const timeoutMinutes = isWebflow ? 0.01 : 1;
+      const timeoutDuration = timeoutMinutes * 60 * 1000;
+
+      return new Promise((resolve) => {
+        console.log("waitForAppLoaded started");
+
+        let resolved = false;
+
+        function handleMessage(event) {
+          if (event.data?.type === "VERGE3D_LOADED") {
+            console.log("3D has actually loaded");
+            has3DLoaded = true;
+            cleanup();
+            resolved = true;
             resolve("3D is loaded!");
-            return;
           }
-        } catch (e) {
-          console.log("Cannot access is3DLoaded (cross-origin)");
         }
-        console.log("Loading Check");
-      }, 2000);
 
-      setTimeout(() => {
-        clearInterval(interval);
-        console.log("waitForAppLoaded timeout reached");
-        resolve("Timeout waiting for 3D to load");
-      }, timeoutDuration);
-    });
+        function cleanup() {
+          window.removeEventListener("message", handleMessage);
+          clearTimeout(timeoutId);
+        }
+
+        window.addEventListener("message", handleMessage);
+
+        const timeoutId = setTimeout(() => {
+          if (resolved) return;
+          console.log("waitForAppLoaded timeout reached");
+          cleanup();
+          resolve("Timeout waiting for 3D to load");
+        }, timeoutDuration);
+      });
+    }
+
+    function ensureInitialState() {
+      if (hasInitialized && document.visibilityState === "visible") return;
+
+      console.log("Applying initial state (visible tab)");
+      applyInitialState();
+
+      hiddenUIElements.forEach((element) => {
+        element.classList.remove("is-hidden");
+      });
+
+      updateCurrentOptionsStyles();
+
+      hasInitialized = true;
+    }
+
+    function handleTabActivation() {
+      if (document.visibilityState !== "visible") return;
+
+      console.log("Tab became visible, waiting for 3D loaded message");
+
+      waitForAppLoaded().then((msg) => {
+        console.log("waitForAppLoaded resolved:", msg);
+        ensureInitialState();
+      });
+    }
+
+    document.addEventListener("visibilitychange", handleTabActivation);
+    window.addEventListener("focus", handleTabActivation);
+
+    if (document.visibilityState === "visible") {
+      handleTabActivation();
+    }
   }
-
-  function ensureInitialState() {
-    if (hasInitialized && document.visibilityState === "visible") return;
-
-    // console.log("Applying initial state (visible tab)");
-    // applyInitialState();
-
-    hiddenUIElements.forEach((element) => {
-      element.classList.remove("is-hidden");
-    });
-
-    updateCurrentOptionsStyles();
-
-    iframe.focus();
-    iframe.contentWindow?.focus();
-
-    hasInitialized = true;
-  }
-
-  iframe.onload = () => {
-    console.log("iframe.onload triggered - iframe is loaded");
-  };
-
-  function handleTabActivation() {
-    if (document.visibilityState !== "visible") return;
-
-    console.log("Tab became visible, checking iframe");
-    const iframeWindow = iframe.contentWindow;
-
-    waitForAppLoaded(iframeWindow).then((msg) => {
-      console.log("waitForAppLoaded resolved:", msg);
-      setTimeout(ensureInitialState, 500);
-    });
-  }
-
-  document.addEventListener("visibilitychange", handleTabActivation);
-  window.addEventListener("focus", handleTabActivation);
-
-  if (document.visibilityState === "visible") {
-    handleTabActivation();
-  }
-
   /*=====  End of 3D Model Loading Check ======*/
 
   /*=============================================
@@ -1784,35 +1795,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = new URL(window.location);
     const params = Array.from(new URLSearchParams(url.search).entries());
 
-    let delay = 0;
-    const step = 50; // ms
-
-    function scheduleClick(btn) {
-      if (!btn) return;
-
-      delay += step;
-
-      setTimeout(() => {
-        btn.click();
-      }, delay);
-    }
-
     if (params.length > 1) {
       params.forEach(([key, value]) => {
-        if (key === "options") {
-          value.split("-").forEach((opt) => {
+        if (key !== "id") {
+          if (key === "options") {
+            value.split("-").forEach((opt) => {
+              const btn = document.querySelector(
+                `[data-option-btn][data-code="${opt}"][id^="d_"]`,
+              );
+
+              btn?.click();
+            });
+          } else {
             const btn = document.querySelector(
-              `[data-option-btn][data-code="${opt}"][id^="d_"]`,
+              `[data-field-name="${key}"][data-value="${value}"][id^="d_"]`,
             );
 
-            scheduleClick(btn);
-          });
-        } else {
-          const btn = document.querySelector(
-            `[data-field-name="${key}"][data-value="${value}"][id^="d_"]`,
-          );
-
-          scheduleClick(btn);
+            btn?.click();
+          }
         }
       });
     } else {
@@ -1825,8 +1825,9 @@ document.addEventListener("DOMContentLoaded", () => {
           const btn = document.querySelector(
             `[data-option-btn][id="d_${value}"]`,
           );
+          console.log(btn);
 
-          scheduleClick(btn);
+          btn?.click();
         });
       }
     }
