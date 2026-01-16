@@ -740,10 +740,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return Promise.resolve("3D is already loaded");
       }
 
-      const isWebflow = window.location.href.includes("webflow.io");
-      const timeoutMinutes = isWebflow ? 0.01 : 1;
-      const timeoutDuration = timeoutMinutes * 60 * 1000;
-
       return new Promise((resolve) => {
         console.log("waitForAppLoaded started");
 
@@ -756,6 +752,9 @@ document.addEventListener("DOMContentLoaded", () => {
             cleanup();
             resolved = true;
             resolve("3D is loaded!");
+            if (document.visibilityState === "visible") {
+              ensureInitialState();
+            }
           }
         }
 
@@ -771,20 +770,17 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("waitForAppLoaded timeout reached");
           cleanup();
           resolve("Timeout waiting for 3D to load");
-        }, timeoutDuration);
+        }, 60000);
       });
     }
 
     function ensureInitialState() {
-      if (hasInitialized && document.visibilityState === "visible") return;
+      if (hasInitialized || document.visibilityState !== "visible") return;
 
       console.log("Applying initial state (visible tab)");
       applyInitialState();
 
-      hiddenUIElements.forEach((element) => {
-        element.classList.remove("is-hidden");
-      });
-
+      hiddenUIElements.forEach((el) => el?.classList.remove("is-hidden"));
       updateCurrentOptionsStyles();
 
       hasInitialized = true;
@@ -793,7 +789,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleTabActivation() {
       if (document.visibilityState !== "visible") return;
 
-      console.log("Tab became visible, waiting for 3D loaded message");
+      console.log("Tab is visible, waiting for 3D loaded");
 
       waitForAppLoaded().then((msg) => {
         console.log("waitForAppLoaded resolved:", msg);
@@ -808,6 +804,7 @@ document.addEventListener("DOMContentLoaded", () => {
       handleTabActivation();
     }
   }
+
   /*=====  End of 3D Model Loading Check ======*/
 
   /*=============================================
@@ -1825,7 +1822,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const btn = document.querySelector(
             `[data-option-btn][id="d_${value}"]`,
           );
-          console.log(btn);
 
           btn?.click();
         });
