@@ -798,7 +798,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.visibilityState === "visible") {
       handleTabActivation();
     }
-  }, 7000);
+  }, 2000);
 
   /*=====  End of 3D Model Loading Check ======*/
 
