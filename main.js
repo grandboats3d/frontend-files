@@ -237,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
         a.href = link;
         a.className = "header_nav_link";
         a.textContent = text;
-        a.target = "_blank";
         fragment.appendChild(a);
       }
     });
