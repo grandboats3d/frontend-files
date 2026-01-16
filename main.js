@@ -718,87 +718,87 @@ document.addEventListener("DOMContentLoaded", () => {
   /*=====      End of Get Boat Data      ======*/
 
   /*=============================================
-    =            3D Model Loading Check           =
-    =============================================*/
+  =            3D Model Loading Check           =
+  =============================================*/
 
-  const iframe = document.querySelector(".model_component");
-  const hiddenUIElements = document.querySelectorAll(
-    "#features-toggle, #actions-component, #options-component",
-  );
+  setTimeout(() => {
+    const iframe = document.querySelector(".model_component");
+    const hiddenUIElements = document.querySelectorAll(
+      "#features-toggle, #actions-component, #options-component",
+    );
 
-  let hasInitialized = false;
+    let hasInitialized = false;
 
-  function waitForAppLoaded(iframeWindow) {
-    const isWebflow = window.location.href.includes("webflow.io");
-    const timeoutMinutes = isWebflow ? 0.01 : 1;
-    const timeoutDuration = timeoutMinutes * 60 * 1000;
+    function waitForAppLoaded(iframeWindow) {
+      const isWebflow = window.location.href.includes("webflow.io");
+      const timeoutMinutes = isWebflow ? 0.01 : 1;
+      const timeoutDuration = timeoutMinutes * 60 * 1000;
 
-    return new Promise((resolve) => {
-      console.log("waitForAppLoaded started");
-      const interval = setInterval(() => {
-        try {
-          if (iframeWindow.is3DLoaded === true) {
-            setTimeout(function () {
+      return new Promise((resolve) => {
+        console.log("waitForAppLoaded started");
+        const interval = setInterval(() => {
+          try {
+            if (iframeWindow.is3DLoaded === true) {
               clearInterval(interval);
               console.log("3D loaded detected");
               resolve("3D is loaded!");
               return;
-            }, 5000);
+            }
+          } catch (e) {
+            console.log("Cannot access is3DLoaded (cross-origin)");
           }
-        } catch (e) {
-          console.log("Cannot access is3DLoaded (cross-origin)");
-        }
-        console.log("Loading Check");
-      }, 2000);
+          console.log("Loading Check");
+        }, 2000);
 
-      setTimeout(() => {
-        clearInterval(interval);
-        console.log("waitForAppLoaded timeout reached");
-        resolve("Timeout waiting for 3D to load");
-      }, timeoutDuration);
-    });
-  }
+        setTimeout(() => {
+          clearInterval(interval);
+          console.log("waitForAppLoaded timeout reached");
+          resolve("Timeout waiting for 3D to load");
+        }, timeoutDuration);
+      });
+    }
 
-  function ensureInitialState() {
-    if (hasInitialized && document.visibilityState === "visible") return;
+    function ensureInitialState() {
+      if (hasInitialized && document.visibilityState === "visible") return;
 
-    console.log("Applying initial state (visible tab)");
-    applyInitialState();
+      console.log("Applying initial state (visible tab)");
+      applyInitialState();
 
-    hiddenUIElements.forEach((element) => {
-      element.classList.remove("is-hidden");
-    });
+      hiddenUIElements.forEach((element) => {
+        element.classList.remove("is-hidden");
+      });
 
-    updateCurrentOptionsStyles();
+      updateCurrentOptionsStyles();
 
-    iframe.focus();
-    iframe.contentWindow?.focus();
+      iframe.focus();
+      iframe.contentWindow?.focus();
 
-    hasInitialized = true;
-  }
+      hasInitialized = true;
+    }
 
-  iframe.onload = () => {
-    console.log("iframe.onload triggered - iframe is loaded");
-  };
+    iframe.onload = () => {
+      console.log("iframe.onload triggered - iframe is loaded");
+    };
 
-  function handleTabActivation() {
-    if (document.visibilityState !== "visible") return;
+    function handleTabActivation() {
+      if (document.visibilityState !== "visible") return;
 
-    console.log("Tab became visible, checking iframe");
-    const iframeWindow = iframe.contentWindow;
+      console.log("Tab became visible, checking iframe");
+      const iframeWindow = iframe.contentWindow;
 
-    waitForAppLoaded(iframeWindow).then((msg) => {
-      console.log("waitForAppLoaded resolved:", msg);
-      setTimeout(ensureInitialState, 500);
-    });
-  }
+      waitForAppLoaded(iframeWindow).then((msg) => {
+        console.log("waitForAppLoaded resolved:", msg);
+        setTimeout(ensureInitialState, 500);
+      });
+    }
 
-  document.addEventListener("visibilitychange", handleTabActivation);
-  window.addEventListener("focus", handleTabActivation);
+    document.addEventListener("visibilitychange", handleTabActivation);
+    window.addEventListener("focus", handleTabActivation);
 
-  if (document.visibilityState === "visible") {
-    handleTabActivation();
-  }
+    if (document.visibilityState === "visible") {
+      handleTabActivation();
+    }
+  }, 7000);
 
   /*=====  End of 3D Model Loading Check ======*/
 
