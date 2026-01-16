@@ -738,10 +738,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const interval = setInterval(() => {
         try {
           if (iframeWindow.is3DLoaded === true) {
-            clearInterval(interval);
-            console.log("3D loaded detected");
-            resolve("3D is loaded!");
-            return;
+            setTimeout(function () {
+              clearInterval(interval);
+              console.log("3D loaded detected");
+              resolve("3D is loaded!");
+              return;
+            }, 5000);
           }
         } catch (e) {
           console.log("Cannot access is3DLoaded (cross-origin)");
