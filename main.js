@@ -759,8 +759,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function ensureInitialState() {
     if (hasInitialized && document.visibilityState === "visible") return;
 
-    console.log("Applying initial state (visible tab)");
-    applyInitialState();
+    // console.log("Applying initial state (visible tab)");
+    // applyInitialState();
 
     hiddenUIElements.forEach((element) => {
       element.classList.remove("is-hidden");
