@@ -1786,6 +1786,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = new URL(window.location);
     const params = Array.from(new URLSearchParams(url.search).entries());
 
+    let delay = 0;
+    const step = 500; // ms
+
+    function scheduleClick(btn) {
+      if (!btn) return;
+
+      delay += step;
+
+      setTimeout(() => {
+        btn.click();
+      }, delay);
+    }
+
     if (params.length > 1) {
       params.forEach(([key, value]) => {
         if (key === "options") {
@@ -1793,17 +1806,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = document.querySelector(
               `[data-option-btn][data-code="${opt}"][id^="d_"]`,
             );
-            if (btn) {
-              btn.click();
-            }
+
+            scheduleClick(btn);
           });
         } else {
           const btn = document.querySelector(
             `[data-field-name="${key}"][data-value="${value}"][id^="d_"]`,
           );
-          if (btn) {
-            btn.click();
-          }
+
+          scheduleClick(btn);
         }
       });
     } else {
@@ -1812,13 +1823,12 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       if (Array.isArray(initialColorsAndOptions)) {
-        initialColorsAndOptions.forEach((value, index) => {
+        initialColorsAndOptions.forEach((value) => {
           const btn = document.querySelector(
             `[data-option-btn][id="d_${value}"]`,
           );
-          if (btn) {
-            btn.click();
-          }
+
+          scheduleClick(btn);
         });
       }
     }
