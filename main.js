@@ -717,6 +717,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*=====      End of Get Boat Data      ======*/
 
+  function finalizeUISetup(els) {
+    els.forEach((el) => el?.classList.remove("is-hidden"));
+    updateCurrentOptionsStyles();
+  }
+
   /*=============================================
   =            3D Model Loading Check           =
   =============================================*/
@@ -780,8 +785,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Applying initial state (visible tab)");
       applyInitialState();
 
-      hiddenUIElements.forEach((el) => el?.classList.remove("is-hidden"));
-      updateCurrentOptionsStyles();
+      finalizeUISetup(hiddenUIElements);
 
       hasInitialized = true;
     }
