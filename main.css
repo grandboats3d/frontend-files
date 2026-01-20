@@ -2,8 +2,6 @@
   display: none !important;
 }
 
-
-
 /*=============================================
 =                  Nav block                  =
 =============================================*/
@@ -31,10 +29,6 @@
 
 /*=====        End of Nav block        ======*/
 
-
-
-
-
 /*=============================================
   =                    Toggle                   =
   =============================================*/
@@ -52,14 +46,10 @@
 }
 
 .toggle_component.is-active .toggle_switch_icon {
-  transform: translate(-1.5rem, -50%);
+  transform: translate(1.5rem, -50%);
 }
 
 /*=====          End of Toggle         ======*/
-
-
-
-
 
 /*=============================================
   =                Water Surface                =
@@ -70,19 +60,16 @@
 }
 
 .actions_btn.is-active:hover {
-  background-color: var(--_colors---brand--main-60)
+  background-color: var(--_colors---brand--main-60);
 }
 
 /*=====      End of Water Surface      ======*/
-
-
-
 
 /*=============================================
   =                Technical Data               =
   =============================================*/
 
-.technical-data_text>*:nth-child(2n) {
+.technical-data_text > *:nth-child(2n) {
   font-weight: 600;
 }
 
@@ -99,9 +86,6 @@
 }
 
 /*=====      End of Technical Data     ======*/
-
-
-
 
 /*=============================================
   =                   Options                   =
@@ -126,39 +110,37 @@
 }
 
 .options_btn.is-active,
-.options_btn.is-active+.options_btn {
+.options_btn.is-active + .options_btn {
   background-color: var(--_colors---brand--main);
 }
 
 @media screen and (pointer: fine) {
-  .options_btn:hover+.options_btn {
+  .options_btn:hover + .options_btn {
     background-color: var(--_colors---options--hover);
   }
 
-  .options_btn:active+.options_btn {
+  .options_btn:active + .options_btn {
     background-color: var(--_colors---options--default);
   }
 
   .options_btn.is-active:hover,
-  .options_btn.is-active:hover+.options_btn,
-  .options_btn.is-active+.options_btn:hover {
+  .options_btn.is-active:hover + .options_btn,
+  .options_btn.is-active + .options_btn:hover {
     background-color: var(--_colors---brand--main-60);
   }
 
   .options_btn.is-active:active,
-  .options_btn.is-active+.options_btn:active {
+  .options_btn.is-active + .options_btn:active {
     background-color: var(--_colors---brand--main-60);
   }
-
 }
 
-.options_btn.is-inactive+.options_btn,
-.options_btn.is-disabled+.options_btn {
+.options_btn.is-inactive + .options_btn,
+.options_btn.is-disabled + .options_btn {
   pointer-events: none;
   background-image: url(https://cdn.prod.website-files.com/685413654baa638cbdfc35f7/68ad68bd6ee4b6a824f6809f_i-disabled.svg);
   cursor: default;
 }
-
 
 @media screen and (max-width: 390px) {
   .options_controls.is-grid {
@@ -167,8 +149,6 @@
 }
 
 /*=====         End of Options         ======*/
-
-
 
 /*=============================================
   =                     Form                    =
@@ -182,9 +162,6 @@
 
 /*=====           End of Form          ======*/
 
-
-
-
 /*=============================================
   =               Tablets > 991px               =
   =============================================*/
@@ -193,9 +170,18 @@
   body {
     --header--height: 2.875rem;
     --container--default: 100%;
-    --horizontal-spaser--default: .75rem;
-    --global--side-gap: max(calc((100vw - var(--container--default) + 2 * var(--horizontal-spaser--default)) / 2), var(--horizontal-spaser--default));
-    --nav--top: calc(var(--header--height) + .75rem);
+    --horizontal-spaser--default: 0.75rem;
+    --global--side-gap: max(
+      calc(
+        (
+            100vw - var(--container--default) + 2 *
+              var(--horizontal-spaser--default)
+          ) /
+          2
+      ),
+      var(--horizontal-spaser--default)
+    );
+    --nav--top: calc(var(--header--height) + 0.75rem);
     --popup--padding: 2rem;
     --_colors---options--hover: var(--_colors---options--bg);
     --_colors---options--active-hover: var(--_colors---brand--main);
@@ -250,7 +236,6 @@
     left: 0%;
   }
 
-
   .nav_component {
     display: none;
   }
@@ -264,10 +249,10 @@
     align-items: center;
     min-width: 15.3125rem;
     height: 2.5rem;
-    margin-top: .5rem;
-    margin-bottom: .5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     margin-left: 0;
-    font-size: .75rem;
+    font-size: 0.75rem;
     font-weight: 600;
     display: flex;
     position: relative;
@@ -287,7 +272,6 @@
     left: 0%;
   }
 
-
   .actions_component {
     flex-flow: column;
     justify-content: flex-end;
@@ -295,10 +279,9 @@
   }
 
   .actions_btn {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
     margin-right: 0;
   }
-
 
   .options_nav-btn:hover {
     background-color: transparent;
@@ -310,8 +293,6 @@
 }
 
 /*=====     End of Tablets > 991px     ======*/
-
-
 
 /*=============================================
 =               Mobile landscape              =
@@ -335,12 +316,11 @@
 
   .toggle_caption {
     margin-right: auto;
-    margin-left: .3125rem;
+    margin-left: 0.3125rem;
   }
 
-
   .options_component {
-    --group-height: calc(5.5 * (.125rem + 1.875rem));
+    --group-height: calc(5.5 * (0.125rem + 1.875rem));
     /* gap + item height */
     --group-max-height: calc(90svh - var(--header--height) - 2 * 2.5rem);
     /* options title and footer height */
@@ -373,7 +353,7 @@
   }
 
   .options_btn {
-    padding-left: .5rem;
+    padding-left: 0.5rem;
   }
 
   .model_component {
