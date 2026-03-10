@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  /*=============================================
-    =                GSAP Defaults                =
-    =============================================*/
-
+  // GSAP Defaults
   const defaultDuration = 0.2;
   const defaultEase = "power2.out";
 
@@ -10,14 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
     duration: defaultDuration,
     ease: defaultEase,
   });
+  // End of GSAP Defaults
 
-  /*=====      End of GSAP Defaults      ======*/
-
-  /*=============================================
-    =          Global Elements/Functions          =
-    =============================================*/
-
-  const apiUrl = "https://js.grandboats.com/api";
+  //Global Elements/Functions
+  const { apiOrigin, frontOrigin } = window.appConfig;
 
   const urlParams = new URLSearchParams(window.location.search);
   const boatId = urlParams.get("id");
@@ -37,6 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const optionsComponent = document.querySelector("#options-component");
 
   const summaryForm = pageWrapper.querySelector("#summary-form");
+
+  const hiddenUIElements = document.querySelectorAll(
+    "#features-toggle, #actions-component, #options-component",
+  );
 
   const isDesktop = window.matchMedia("(min-width: 992px)").matches;
   const allMobileQuery = window.matchMedia("(max-width: 767px)");
@@ -129,11 +126,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /*===  End of Global Elements/Functions  ====*/
+  async function captureScreenshot({
+    iframeEl,
+    quality = 0.85,
+    background = "#fff",
+    maxWidth = 960,
+  } = {}) {
+    const doc = iframeEl?.contentDocument;
+    const glCanvas = doc?.querySelector("canvas");
+    if (!glCanvas) throw new Error("Canvas not found inside iframe");
 
-  /*=============================================
-    =                Get Boat Data                =
-    =============================================*/
+    const img = new Image();
+    img.src = glCanvas.toDataURL("image/png");
+    await img.decode();
+
+    const targetW = Math.min(img.width, maxWidth);
+    const targetH = Math.round(img.height * (targetW / img.width));
+
+    const out = document.createElement("canvas");
+    out.width = targetW;
+    out.height = targetH;
+
+    const ctx = out.getContext("2d");
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, targetW, targetH);
+
+    ctx.drawImage(img, 0, 0, targetW, targetH);
+
+    return out.toDataURL("image/jpeg", quality);
+  }
+  // End of Global Elements/Functions
+
+  // Get Boat Data
   async function fetchData() {
     const cacheKey = "dataCache";
 
@@ -154,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    const response = await fetch(`${apiUrl}/cms/boats/${boatId}`, {
+    const response = await fetch(`${apiOrigin}/cms/boats/${boatId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -189,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.body.dataset.boatId = data.slug;
 
-    /*----------  Initial options  ----------*/
+    // Initial options
     const boatInitialColorsAndOptions = boatData["initial-colors-and-options"];
 
     if (boatInitialColorsAndOptions) {
@@ -219,8 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    /*----------  Add Nav Links  ----------*/
-
+    // Add Nav Links
     const navLinks = [
       ["all-models-text", "all-models-link"],
       ["dealers-text", "dealers-link"],
@@ -238,13 +261,21 @@ document.addEventListener("DOMContentLoaded", () => {
         a.className = "header_nav_link";
         a.textContent = text;
         fragment.appendChild(a);
+
+        if (summaryForm && textKey === "model-details-text") {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = "model";
+          input.value = text;
+
+          summaryForm.prepend(input);
+        }
       }
     });
 
     headerNav.insertBefore(fragment, headerNav.firstChild);
 
-    /*----------  Add Technical Data  ----------*/
-
+    // Add Technical Data
     const technicalData = boatData["technical-data-2"];
 
     if (technicalData && pageWrapper) {
@@ -270,10 +301,28 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
       pageWrapper.appendChild(popup);
+
+      if (summaryForm) {
+        const doc = new DOMParser().parseFromString(technicalData, "text/html");
+        const ps = doc.querySelectorAll("p");
+
+        const items = [];
+        for (let i = 0; i + 1 < ps.length; i += 2) {
+          const label = (ps[i].textContent || "").trim();
+          const value = (ps[i + 1].textContent || "").trim();
+          if (label && value) items.push({ label, value });
+        }
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "characteristics";
+        input.value = JSON.stringify(items);
+
+        summaryForm.prepend(input);
+      }
     }
 
-    /*----------  Add Color  ----------*/
-
+    // Add Color
     const optionItemsData = [
       [
         "color-option-title",
@@ -526,7 +575,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navComponent.insertBefore(colorNavFragment, navComponent.firstChild);
     optionItems.insertBefore(colorOptionsFragment, optionItems.firstChild);
 
-    /*----------  Add Options  ----------*/
+    // Add Options
     const options = boatData.options || [];
     const optionsFragment = document.createDocumentFragment();
     const optionsNavFragment = document.createDocumentFragment();
@@ -705,8 +754,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     optionItems.insertBefore(optionsFragment, optionItems.lastElementChild);
 
-    /*----------  Run Global Functions  ----------*/
-
+    // Run Global Functions
     globalFuncs();
     check3DModelLoading();
   }
@@ -714,17 +762,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!document.body.hasAttribute("data-no-fetch")) {
     fetchDataSequentially();
   }
+  // End of Get Boat Data
 
-  /*=====      End of Get Boat Data      ======*/
-
-  function finalizeUISetup(els) {
-    els.forEach((el) => el?.classList.remove("is-hidden"));
+  //3D Model Loading Check
+  function finalizeUISetup() {
+    hiddenUIElements.forEach((el) => el?.classList.remove("is-hidden"));
     updateCurrentOptionsStyles();
   }
 
-  /*=============================================
-  =            3D Model Loading Check           =
-  =============================================*/
   function check3DModelLoading() {
     const iframe = document.querySelector(".model_component");
     if (!iframe) {
@@ -732,89 +777,36 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const hiddenUIElements = document.querySelectorAll(
-      "#features-toggle, #actions-component, #options-component",
-    );
+    let handled = false;
 
-    let hasInitialized = false;
-    let has3DLoaded = false;
+    function handleMessage(event) {
+      if (event.data?.type !== "VERGE3D_LOADED") return;
+      if (handled) return;
 
-    function waitForAppLoaded() {
-      if (has3DLoaded) {
-        console.log("3D already loaded, skipping wait");
-        return Promise.resolve("3D is already loaded");
-      }
+      handled = true;
+      console.log("3D has loaded");
 
-      return new Promise((resolve) => {
-        console.log("waitForAppLoaded started");
+      window.removeEventListener("message", handleMessage);
+      clearTimeout(timeoutid);
 
-        let resolved = false;
-
-        function handleMessage(event) {
-          if (event.data?.type === "VERGE3D_LOADED") {
-            console.log("3D has actually loaded");
-            has3DLoaded = true;
-            cleanup();
-            resolved = true;
-            resolve("3D is loaded!");
-            if (document.visibilityState === "visible") {
-              ensureInitialState();
-            }
-          }
-        }
-
-        function cleanup() {
-          window.removeEventListener("message", handleMessage);
-          clearTimeout(timeoutId);
-        }
-
-        window.addEventListener("message", handleMessage);
-
-        const timeoutId = setTimeout(() => {
-          if (resolved) return;
-          console.log("waitForAppLoaded timeout reached");
-          cleanup();
-          resolve("Timeout waiting for 3D to load");
-        }, 60000);
-      });
-    }
-
-    function ensureInitialState() {
-      if (hasInitialized || document.visibilityState !== "visible") return;
-
-      console.log("Applying initial state (visible tab)");
+      console.log("Applying initial state");
       applyInitialState();
 
-      finalizeUISetup(hiddenUIElements);
-
-      hasInitialized = true;
+      finalizeUISetup();
     }
 
-    function handleTabActivation() {
-      if (document.visibilityState !== "visible") return;
+    window.addEventListener("message", handleMessage);
 
-      console.log("Tab is visible, waiting for 3D loaded");
-
-      waitForAppLoaded().then((msg) => {
-        console.log("waitForAppLoaded resolved:", msg);
-        ensureInitialState();
-      });
-    }
-
-    document.addEventListener("visibilitychange", handleTabActivation);
-    window.addEventListener("focus", handleTabActivation);
-
-    if (document.visibilityState === "visible") {
-      handleTabActivation();
-    }
+    const timeoutid = setTimeout(() => {
+      if (handled) return;
+      console.warn("Timeout waiting for VERGE3D_LOADED");
+      window.removeEventListener("message", handleMessage);
+    }, 60000);
   }
 
-  /*=====  End of 3D Model Loading Check ======*/
+  // End of 3D Model Loading Check
 
-  /*=============================================
-    =              Boat Options Codes             =
-    =============================================*/
-
+  // Boat Options Codes
   function getBoatOptionsCodes() {
     const storageKey = "boatOptionsCodes";
     const boatIdRaw = document.body.dataset.boatId;
@@ -833,9 +825,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return Promise.resolve(parsed[boatId] || null);
     }
 
-    return fetch(
-      "https://grandboats3d.github.io/frontend-files/boat-options-codes.json",
-    )
+    return fetch(`${frontOrigin}/boat-options-codes.json`)
       .then((res) => res.json())
       .then((data) => {
         sessionStorage.setItem(storageKey, JSON.stringify(data));
@@ -847,13 +837,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return null;
       });
   }
+  // End of Boat Options Codes
 
-  /*=====    End of Boat Options Codes   ======*/
-
-  /*=============================================
-    =                3D Action Ids                =
-    =============================================*/
-
+  // 3D Action Ids
   function init3dActionIds() {
     document.querySelectorAll("[data-3d-action]").forEach((el) => {
       const currentId = el.id;
@@ -882,12 +868,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /*=====      End of 3D Action Ids      ======*/
+  // End of 3D Action Ids
 
-  /*=============================================
-    =                   Filter                    =
-    =============================================*/
-
+  // Filter
   function colorFilter() {
     const colorButtons = [
       ...document.querySelectorAll("[data-option-btn][data-is-color]"),
@@ -1194,13 +1177,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+  // End of Filter
 
-  /*=====         End of Filter          ======*/
-
-  /*=============================================
-    =                  Nav Block                  =
-    =============================================*/
-
+  // Nav Block
   function handleNavBtnClicks() {
     if (navComponent) {
       const allBtns = [...navComponent.querySelectorAll("[data-nav-btn]")];
@@ -1246,12 +1225,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /*=====        End of Nav Block        ======*/
+  // End of Nav Block
 
-  /*=============================================
-    =               Toggle Hide Menu               =
-    =============================================*/
-
+  // Toggle Hide Menu
   const toggleHideMenu = document.getElementById("toggle-hide-menu");
 
   if (toggleHideMenu) {
@@ -1279,13 +1255,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  // End of Toggle Hide Menu
 
-  /*=====     End of Toggle Hide Menu     ======*/
-
-  /*=============================================
-    =               Mobile Menu               =
-    =============================================*/
-
+  // Mobile Menu
   if (headerNav) {
     const headerNavDuration = 0.3;
 
@@ -1311,13 +1283,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+  // End of Mobile Menu
 
-  /*=====     End of Mobile Menu     ======*/
-
-  /*=============================================
-    =                    Popups                   =
-    =============================================*/
-
+  // Popups
   function handlePopups() {
     document.querySelectorAll("[data-popup-open]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -1418,11 +1386,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  /*=====          End of Popups         ======*/
+  // End of Popups
 
-  /*=============================================
-    =                   Options                   =
-    =============================================*/
+  // Options
   allMobileQuery.addEventListener("change", () => {
     updateCurrentOptionsStyles();
   });
@@ -1698,13 +1664,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /*=====         End of Options         ======*/
+  // End of Options
 
-  /*=============================================
-    =               Countries Select              =
-    =============================================*/
-
-  fetch("https://grandboats3d.github.io/frontend-files/countries.json")
+  // Countries Select
+  fetch(`${frontOrigin}/countries.json`)
     .then((response) => {
       if (!response.ok) throw new Error("Network response was not ok");
       return response.json();
@@ -1730,13 +1693,9 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch((error) => {
       console.error("Fetch error:", error);
     });
+  // End of Countries Select
 
-  /*=====     End of Countries Select    ======*/
-
-  /*=============================================
-    =               Phone Input Mask              =
-    =============================================*/
-
+  // Phone Input Mask
   const phoneInputs = document.querySelectorAll("[type=tel]");
 
   phoneInputs.forEach((input) => {
@@ -1751,13 +1710,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.execCommand("insertText", false, cleaned);
     });
   });
+  // End of Phone Input Mask
 
-  /*=====     End of Phone Input Mask    ======*/
-
-  /*=============================================
-    =                  Copy Link                  =
-    =============================================*/
-
+  // Copy Link
   document.querySelectorAll("[data-copy-url]").forEach((item) => {
     item.addEventListener("click", () => {
       const address = window.location.href;
@@ -1785,13 +1740,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
+  // End of Copy Link
 
-  /*=====        End of Copy Link        ======*/
-
-  /*=============================================
-    =               Apply URL Params              =
-    =============================================*/
-
+  // Apply URL Params
   function applyInitialState() {
     const url = new URL(window.location);
     const params = Array.from(new URLSearchParams(url.search).entries());
@@ -1833,22 +1784,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /*=====     End of Apply URL Params    ======*/
+  // End of Apply URL Params
 
-  /*=============================================
-    =                Form Submit                  =
-    =============================================*/
-
+  // Form Submit
   document
     .getElementById("form-open-modal-btn")
-    .addEventListener("click", () => {
+    ?.addEventListener("click", async () => {
       const linkInput = document.querySelector('input[name="link"]');
       const screenInput = document.querySelector('input[name="screen"]');
-      if (linkInput) {
-        linkInput.value = window.location.href;
-      }
-      if (screenInput) {
-        screenInput.value = "placeholder";
+
+      if (linkInput) linkInput.value = window.location.href;
+      if (!screenInput) return;
+
+      screenInput.value = "";
+
+      try {
+        const dataUrl = await captureScreenshot({ iframeEl: modelIframe });
+        screenInput.value = dataUrl;
+      } catch (e) {
+        console.warn("Screenshot failed:", e);
+        screenInput.value = "";
       }
     });
 
@@ -1873,7 +1828,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const plainData = Object.fromEntries(formData.entries());
 
     try {
-      const response = await fetch(`${apiUrl}/cms/boats/send-info`, {
+      const response = await fetch(`${apiOrigin}/cms/boats/send-info`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(plainData),
@@ -1903,8 +1858,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, popupDuration * 1000);
     }
   });
-
-  /*=====      End of Form Submit        ======*/
+  // End of Form Submit
 
   // Disabling features before click
   let skipNextClick = false;
@@ -1933,4 +1887,5 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+  // End of Disabling features before click
 });
