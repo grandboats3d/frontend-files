@@ -1828,7 +1828,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const plainData = Object.fromEntries(formData.entries());
 
     try {
-      console.log(JSON.stringify(plainData));
       const response = await fetch(`${apiOrigin}/cms/boats/send-info`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
