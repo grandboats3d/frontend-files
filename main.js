@@ -847,7 +847,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         currentId &&
         !currentId.startsWith("d_") &&
-        !currentId.startsWith("e_")
+        !currentId.startsWith("e_") &&
+        currentId !== "tube_color_off_white_hypalon" &&
+        currentId !== "bowrailing"
       ) {
         el.id = "d_" + currentId;
       }
@@ -1752,18 +1754,36 @@ document.addEventListener("DOMContentLoaded", () => {
         if (key !== "id") {
           if (key === "options") {
             value.split("-").forEach((opt) => {
-              const btn = document.querySelector(
+              let btn = document.querySelector(
                 `[data-option-btn][data-code="${opt}"][id^="d_"]`,
               );
 
+              if (btn === null) {
+                btn = document.querySelector(
+                  `[data-option-btn][data-code="${opt}"]`,
+                );
+              }
+
               btn?.click();
+              console.log("click");
+              console.log(btn);
+              console.log(" ");
             });
           } else {
-            const btn = document.querySelector(
+            let btn = document.querySelector(
               `[data-field-name="${key}"][data-value="${value}"][id^="d_"]`,
             );
 
+            if (btn === null) {
+              btn = document.querySelector(
+                `[data-field-name="${key}"][data-value="${value}"]`,
+              );
+            }
+
             btn?.click();
+            console.log("click");
+            console.log(btn);
+            console.log(" ");
           }
         }
       });
@@ -1774,11 +1794,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (Array.isArray(initialColorsAndOptions)) {
         initialColorsAndOptions.forEach((value) => {
-          const btn = document.querySelector(
+          let btn = document.querySelector(
             `[data-option-btn][id="d_${value}"]`,
           );
 
+          if (btn === null) {
+            btn = document.querySelector(`[data-option-btn][id="${value}"]`);
+          }
+
           btn?.click();
+          console.log("click");
+          console.log(btn);
+          console.log(" ");
         });
       }
     }
@@ -1815,6 +1842,113 @@ document.addEventListener("DOMContentLoaded", () => {
     '[data-popup-open="form-success"]',
   );
 
+  /*form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!form.reportValidity()) return;
+
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Sending...";
+    submitBtn.disabled = true;
+
+    const formData = new FormData(form);
+
+    async function compressToLimit(base64, maxLength = 50000) {
+      let quality = 0.8;
+      let maxWidth = 1200;
+      let maxHeight = 1200;
+    
+      while (quality > 0.1) {
+        const compressed = await compressImage(base64, {
+          maxWidth,
+          maxHeight,
+          quality
+        });
+    
+        console.log("try:", quality, maxWidth, compressed.length);
+    
+        if (compressed.length <= maxLength) {
+          return compressed;
+        }
+    
+        // 🔽 спочатку зменшуємо якість
+        if (quality > 0.3) {
+          quality -= 0.1;
+        } else {
+          // 🔽 потім починаємо зменшувати розмір
+          maxWidth *= 0.8;
+          maxHeight *= 0.8;
+        }
+      }
+    
+      // ❗ ФІНАЛЬНИЙ fail-safe
+      console.warn("Image too large, dropping");
+    
+      return null; // або "" або взагалі видалити поле
+    }
+
+    
+    if (formData.has("screen")) {
+      let screen = formData.get("screen");
+    
+      // якщо це File/Blob → конвертуємо в base64
+      if (screen instanceof File || screen instanceof Blob) {
+        screen = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(screen);
+        });
+      }
+    
+      // якщо це string (base64)
+      if (typeof screen === "string") {
+        if (screen.length > 50000) {
+          screen = await compressToLimit(screen, 50000);
+      }
+
+     if (screen) {
+        formData.set("screen", screen);
+      } else {
+        formData.delete("screen");
+      }
+    }}
+
+    const plainData = Object.fromEntries(formData.entries());
+
+
+    try {
+      const response = await fetch(`${apiOrigin}/cms/boats/send-info`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(plainData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        popupClose.click();
+        setTimeout(() => {
+          successTrigger.click();
+          form.reset();
+        }, popupDuration * 500);
+      } else {
+        console.error("Server error:", result);
+        error.classList.add("is-shown");
+        setTimeout(() => {
+          error.classList.remove("is-shown");
+        }, 5000);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+    } finally {
+      setTimeout(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }, popupDuration * 1000);
+    }
+  });*/
+  // End of Form Submit
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -1825,6 +1959,104 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.disabled = true;
 
     const formData = new FormData(form);
+
+    async function compressImage(base64, {
+  maxWidth = 800,
+  maxHeight = 800,
+  quality = 0.7
+} = {}) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = () => {
+      let { width, height } = img;
+
+      // 🔽 зменшуємо пропорційно
+      if (width > maxWidth || height > maxHeight) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height);
+        width = width * ratio;
+        height = height * ratio;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 🔽 стискаємо
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+
+      resolve(compressedBase64);
+    };
+
+    img.onerror = reject;
+    img.src = base64;
+  });
+}
+
+    async function compressToLimit(base64, maxLength = 50000) {
+      let quality = 0.8;
+      let maxWidth = 1200;
+      let maxHeight = 1200;
+    
+      while (quality > 0.1) {
+        const compressed = await compressImage(base64, {
+          maxWidth,
+          maxHeight,
+          quality
+        });
+    
+        console.log("try:", quality, maxWidth, compressed.length);
+    
+        if (compressed.length <= maxLength) {
+          return compressed;
+        }
+    
+        // 🔽 спочатку зменшуємо якість
+        if (quality > 0.3) {
+          quality -= 0.1;
+        } else {
+          // 🔽 потім починаємо зменшувати розмір
+          maxWidth *= 0.8;
+          maxHeight *= 0.8;
+        }
+      }
+    
+      // ❗ ФІНАЛЬНИЙ fail-safe
+      console.warn("Image too large, dropping");
+    
+      return null; // або "" або взагалі видалити поле
+    }
+    
+
+    if (formData.has("screen")) {
+      let screen = formData.get("screen");
+    
+      // якщо це File/Blob → конвертуємо в base64
+      if (screen instanceof File || screen instanceof Blob) {
+        screen = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(screen);
+        });
+      }
+    
+      // якщо це string (base64)
+      if (typeof screen === "string") {
+        if (screen.length > 50000) {
+          screen = await compressToLimit(screen, 50000);
+        }
+
+       if (screen) {
+          formData.set("screen", screen);
+        } else {
+          formData.delete("screen");
+        }
+    }}
+
+    
     const plainData = Object.fromEntries(formData.entries());
 
     try {
@@ -1859,7 +2091,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   // End of Form Submit
-
+  
   // Disabling features before click
   let skipNextClick = false;
   const checkFeaturesElements = document.querySelectorAll(
