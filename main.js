@@ -847,9 +847,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         currentId &&
         !currentId.startsWith("d_") &&
-        !currentId.startsWith("e_") &&
-        currentId !== "tube_color_off_white_hypalon" &&
-        currentId !== "bowrailing"
+        !currentId.startsWith("e_")
       ) {
         el.id = "d_" + currentId;
       }
@@ -1765,9 +1763,6 @@ document.addEventListener("DOMContentLoaded", () => {
               }
 
               btn?.click();
-              console.log("click");
-              console.log(btn);
-              console.log(" ");
             });
           } else {
             let btn = document.querySelector(
@@ -1781,9 +1776,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             btn?.click();
-            console.log("click");
-            console.log(btn);
-            console.log(" ");
           }
         }
       });
@@ -1803,9 +1795,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           btn?.click();
-          console.log("click");
-          console.log(btn);
-          console.log(" ");
         });
       }
     }
@@ -1857,20 +1846,20 @@ document.addEventListener("DOMContentLoaded", () => {
       let quality = 0.8;
       let maxWidth = 1200;
       let maxHeight = 1200;
-    
+
       while (quality > 0.1) {
         const compressed = await compressImage(base64, {
           maxWidth,
           maxHeight,
           quality
         });
-    
+
         console.log("try:", quality, maxWidth, compressed.length);
-    
+
         if (compressed.length <= maxLength) {
           return compressed;
         }
-    
+
         // 🔽 спочатку зменшуємо якість
         if (quality > 0.3) {
           quality -= 0.1;
@@ -1880,17 +1869,17 @@ document.addEventListener("DOMContentLoaded", () => {
           maxHeight *= 0.8;
         }
       }
-    
+
       // ❗ ФІНАЛЬНИЙ fail-safe
       console.warn("Image too large, dropping");
-    
+
       return null; // або "" або взагалі видалити поле
     }
 
-    
+
     if (formData.has("screen")) {
       let screen = formData.get("screen");
-    
+
       // якщо це File/Blob → конвертуємо в base64
       if (screen instanceof File || screen instanceof Blob) {
         screen = await new Promise((resolve) => {
@@ -1899,7 +1888,7 @@ document.addEventListener("DOMContentLoaded", () => {
           reader.readAsDataURL(screen);
         });
       }
-    
+
       // якщо це string (base64)
       if (typeof screen === "string") {
         if (screen.length > 50000) {
@@ -1960,60 +1949,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formData = new FormData(form);
 
-    async function compressImage(base64, {
-  maxWidth = 800,
-  maxHeight = 800,
-  quality = 0.7
-} = {}) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
+    async function compressImage(
+      base64,
+      { maxWidth = 800, maxHeight = 800, quality = 0.7 } = {},
+    ) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
 
-    img.onload = () => {
-      let { width, height } = img;
+        img.onload = () => {
+          let { width, height } = img;
 
-      // 🔽 зменшуємо пропорційно
-      if (width > maxWidth || height > maxHeight) {
-        const ratio = Math.min(maxWidth / width, maxHeight / height);
-        width = width * ratio;
-        height = height * ratio;
-      }
+          // 🔽 зменшуємо пропорційно
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = width * ratio;
+            height = height * ratio;
+          }
 
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
 
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
 
-      // 🔽 стискаємо
-      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          // 🔽 стискаємо
+          const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
 
-      resolve(compressedBase64);
-    };
+          resolve(compressedBase64);
+        };
 
-    img.onerror = reject;
-    img.src = base64;
-  });
-}
+        img.onerror = reject;
+        img.src = base64;
+      });
+    }
 
     async function compressToLimit(base64, maxLength = 50000) {
       let quality = 0.8;
       let maxWidth = 1200;
       let maxHeight = 1200;
-    
+
       while (quality > 0.1) {
         const compressed = await compressImage(base64, {
           maxWidth,
           maxHeight,
-          quality
+          quality,
         });
-    
+
         console.log("try:", quality, maxWidth, compressed.length);
-    
+
         if (compressed.length <= maxLength) {
           return compressed;
         }
-    
+
         // 🔽 спочатку зменшуємо якість
         if (quality > 0.3) {
           quality -= 0.1;
@@ -2023,17 +2011,16 @@ document.addEventListener("DOMContentLoaded", () => {
           maxHeight *= 0.8;
         }
       }
-    
+
       // ❗ ФІНАЛЬНИЙ fail-safe
       console.warn("Image too large, dropping");
-    
+
       return null; // або "" або взагалі видалити поле
     }
-    
 
     if (formData.has("screen")) {
       let screen = formData.get("screen");
-    
+
       // якщо це File/Blob → конвертуємо в base64
       if (screen instanceof File || screen instanceof Blob) {
         screen = await new Promise((resolve) => {
@@ -2042,21 +2029,21 @@ document.addEventListener("DOMContentLoaded", () => {
           reader.readAsDataURL(screen);
         });
       }
-    
+
       // якщо це string (base64)
       if (typeof screen === "string") {
         if (screen.length > 50000) {
           screen = await compressToLimit(screen, 50000);
         }
 
-       if (screen) {
+        if (screen) {
           formData.set("screen", screen);
         } else {
           formData.delete("screen");
         }
-    }}
+      }
+    }
 
-    
     const plainData = Object.fromEntries(formData.entries());
 
     try {
@@ -2091,7 +2078,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   // End of Form Submit
-  
+
   // Disabling features before click
   let skipNextClick = false;
   const checkFeaturesElements = document.querySelectorAll(
