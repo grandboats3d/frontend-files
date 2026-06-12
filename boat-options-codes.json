@@ -297,5 +297,94 @@
     "harbour_cover": { "code": "298101" },
     "rear_seat_cover": { "code": "2984" },
     "overpressure_valves": { "code": "414602" }
+  },
+
+  "d950-dive": {
+    "suspension_sports_seat": { "code": "230005" },
+    "double_seat_leaning": { "code": "230007" },
+    "diving_platform_wladder": { "code": "255701" },
+    "waterski_mast_d950_handrails": { "code": "2544" },
+    "swimming_platforms_1engine": { "code": "243701" },
+    "swimming_platforms_2engines": { "code": "2437" },
+    "bowrailing": { "code": "2548" },
+    "prem_wheel": { "code": "2282" },
+    "canvas_ttop": { "code": "2549" },
+    "overpressure_valves": { "code": "414602" }
+  },
+
+  "d950-adventure": {
+"suspension_sports_seat": { "code": "230005" },
+    "double_seat_leaning": { "code": "230007" },
+    "waterski_mast_d950_handrails": { "code": "2544" },
+    "swimming_platforms_1engine": { "code": "243701" },
+    "swimming_platforms_2engines": { "code": "2437" },
+    "bowrailing": { "code": "2548" },
+    "prem_wheel": { "code": "2282" },
+    "canvas_ttop_950adventure": { "code": "2549" },
+    "overpressure_valves": { "code": "414602" }
+  },
+  
+  "d950drive": {
+    "suspension_sports_seat": { "code": "230005" },
+    "double_seat_leaning": { "code": "230007" },
+    "waterski_mast_d950_handrails": { "code": "2544" },
+    "swimming_platforms_1engine": { "code": "243701" },
+    "swimming_platforms_2engines": { "code": "2437" },
+    "bowrailing": { "code": "2548" },
+    "prem_wheel": { "code": "2282" },
+    "canvas_ttop": { "code": "2549" },
+    "jockey_seats_cover": { "code": "279902" },
+    "harbour_cover": { "code": "279901" },
+    "overpressure_valves": { "code": "414602" }
+  },
+
+  "s470nl": {
+    "navigation_classic_roll_bar": { "code": "2513" },
+    "el_pack": {
+      "code": "2704",
+      "code_second": "2702"
+    },
+    "bow_step_plate": { "code": "2413" },
+    "tube_stepends": { "code": "2422" },
+    "tube_round_ends": { "code": "242001" },
+    "bow_sundeck": { "code": "2327" },
+    "canvas_bimini_top": { "code": "2392" },
+    "overall_cover": { "code": "288201" },
+    "console_cover": { "code": "2883" },
+    "double_seat_cover": { "code": "2884" },
+    "seadek_soft_anti_skid": { "code": "3512" },
+    "keel_protector_package": { "code": "2911" },
+    "tube_protector_package": { "code": "2912" },
+    "overpressure_valves": { "code": "4146" }
+  },
+
+    "s470ns": {
+    "navigation_classic_roll_bar": { "code": "2513" },
+    "el_pack": {
+      "code": "2704",
+      "code_second": "2702"
+    },
+    "bow_step_plate": { "code": "2413" },
+    "tube_stepends": { "code": "2422" },
+    "tube_round_ends": { "code": "242001" },
+    "bow_locker_removable_cushion": { "code": "2338" },
+    "bow_sundeck": { "code": "2327" },
+    "canvas_bimini_top": { "code": "2392" },
+    "overall_cover": { "code": "2881" },
+    "console_cover": { "code": "2868" },
+    "keel_protector_package": { "code": "2911" },
+    "tube_protector_package": { "code": "2912" },
+    "overpressure_valves": { "code": "4146" }
+  },
+
+    "s470n": {
+    "bow_step_plate": { "code": "2413" },
+    "tube_stepends": { "code": "2422" },
+    "tube_round_ends": { "code": "242001" },
+    "bow_locker_removable_cushion": { "code": "2338" },
+    "overall_cover": { "code": "2880" },
+    "keel_protector_package": { "code": "2911" },
+    "tube_protector_package": { "code": "2912" },
+    "overpressure_valves": { "code": "4146" }
   }
 }
