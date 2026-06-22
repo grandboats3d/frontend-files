@@ -1470,6 +1470,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let secondCodeActivatorsMap = new Map();
     let relatedOptionsMap = new Map();
 
+    // data-second-code-activator may list several activator ids ("a, b, c").
+    // Split into a clean array of bare ids (works for a single value too).
+    const parseActivatorList = (raw) =>
+      (raw || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
     optionControls.forEach((controlGroup) => {
       const curOptionWithActivators = controlGroup.querySelectorAll(
         "[data-option-btn][data-second-code-activator]",
@@ -1512,39 +1520,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (isMultiple) {
           const isNowActive = clickedButton.classList.toggle("is-active");
-          const urlOption = clickedButton.dataset.code;
+          const primaryCode = clickedButton.dataset.code;
+          const secondCode = clickedButton.dataset.codeSecond;
           let values = params.get("options")?.split("-").filter(Boolean) || [];
-          const index = values.indexOf(urlOption);
 
           if (isNowActive) {
-            if (index === -1) {
-              values.push(urlOption);
-            }
-
-            let fieldValue;
+            let fieldValue = clickedButton.dataset.value;
+            // Default to the primary code; swap to the second code below if an
+            // activator is on, so the URL mirrors the submitted form value.
+            let urlOption = primaryCode;
 
             if (clickedButton.dataset.secondCodeActivator) {
-              const activatorValue = clickedButton.dataset.secondCodeActivator;
-              const targetButton = document.querySelector(
-                `[data-option-btn][data-code][id*="${activatorValue}"]`,
+              // Use the second code if ANY listed activator is currently on.
+              const anyActivatorEnabled = parseActivatorList(
+                clickedButton.dataset.secondCodeActivator,
+              ).some((act) =>
+                document.querySelector(`[data-option-btn][id="e_${act}"]`),
               );
 
-              if (targetButton && targetButton.id.startsWith("e_")) {
+              if (anyActivatorEnabled) {
                 fieldValue = clickedButton.dataset.valueSecond;
-              } else {
-                fieldValue = clickedButton.dataset.value;
+                urlOption = secondCode;
               }
-            } else {
-              fieldValue = clickedButton.dataset.value;
             }
+
+            // This option owns exactly one slot in the URL: drop any prior
+            // variant (primary or second) before adding the current one, so it
+            // can never appear twice when both a direct click and an activator
+            // swap touch it.
+            values = values.filter(
+              (v) => v !== primaryCode && v !== secondCode,
+            );
+            values.push(urlOption);
 
             summaryForm.querySelector(
               `[name="${clickedButton.dataset.codeFieldName}"]`,
             ).value = fieldValue;
           } else {
-            if (index > -1) {
-              values.splice(index, 1);
-            }
+            // Drop whichever variant (primary or second) is currently in the URL.
+            values = values.filter(
+              (v) => v !== primaryCode && v !== secondCode,
+            );
 
             summaryForm.querySelector(
               `[name="${clickedButton.dataset.codeFieldName}"]`,
@@ -1590,12 +1606,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     secondCodeActivatorsMap.forEach((value, key) => {
+      const activators = parseActivatorList(key);
       const matchingOptions = document.querySelectorAll(
         "[data-option-btn][data-is-option]",
       );
 
       matchingOptions.forEach((option) => {
-        if (option.id && option.id.includes(key)) {
+        if (option.id && activators.some((act) => option.id.includes(act))) {
           option.dataset.secondCodeActivatorParent = value;
         }
       });
@@ -1612,22 +1629,66 @@ document.addEventListener("DOMContentLoaded", () => {
           document.querySelectorAll(
             "[data-option-btn][data-second-code-activator]",
           ),
-        ).filter((el) => el.dataset.secondCodeActivator === parentKey);
+        ).filter((el) =>
+          parseActivatorList(el.dataset.secondCodeActivator).includes(parentKey),
+        );
+
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        let values = params.get("options")?.split("-").filter(Boolean) || [];
+        let urlChanged = false;
 
         matchingOptions.forEach((option) => {
           if (option.id.startsWith("e_")) {
+            // Re-evaluate ALL activators: second code stays while any is on.
+            const anyActivatorEnabled = parseActivatorList(
+              option.dataset.secondCodeActivator,
+            ).some((act) =>
+              document.querySelector(`[data-option-btn][id="e_${act}"]`),
+            );
+
             const field = summaryForm.querySelector(
               `[name="${option.dataset.codeFieldName}"]`,
             );
             if (field) {
-              if (parent.id.startsWith("e_")) {
-                field.value = option.dataset.valueSecond;
-              } else if (parent.id.startsWith("d_")) {
-                field.value = option.dataset.value;
-              }
+              field.value = anyActivatorEnabled
+                ? option.dataset.valueSecond
+                : option.dataset.value;
+            }
+
+            // Mirror the swap into the URL options param, collapsing the
+            // option to a single slot: locate its current variant, strip ALL
+            // variants, then reinsert the wanted code at that position.
+            const primaryCode = option.dataset.code;
+            const secondCode = option.dataset.codeSecond;
+            const wantedCode = anyActivatorEnabled ? secondCode : primaryCode;
+            const idx = values.findIndex(
+              (v) => v === primaryCode || v === secondCode,
+            );
+            if (idx > -1 && wantedCode) {
+              values = values.filter(
+                (v) => v !== primaryCode && v !== secondCode,
+              );
+              values.splice(Math.min(idx, values.length), 0, wantedCode);
+              urlChanged = true;
             }
           }
         });
+
+        if (urlChanged) {
+          if (values.length) {
+            params.set("options", values.join("-"));
+          } else {
+            params.delete("options");
+          }
+
+          const baseUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState(
+            {},
+            "",
+            `${baseUrl}?${params.toString()}`,
+          );
+        }
       });
     });
 
@@ -1753,18 +1814,31 @@ document.addEventListener("DOMContentLoaded", () => {
       params.forEach(([key, value]) => {
         if (key !== "id") {
           if (key === "options") {
+            const clickedOptionBtns = new Set();
             value.split("-").forEach((opt) => {
-              let btn = document.querySelector(
-                `[data-option-btn][data-code="${opt}"][id^="d_"]`,
-              );
-
-              if (btn === null) {
-                btn = document.querySelector(
+              // A code in the URL may be a primary `data-code` OR a swapped
+              // `data-code-second`; match either so second-code options restore.
+              const btn =
+                document.querySelector(
+                  `[data-option-btn][data-code="${opt}"][id^="d_"]`,
+                ) ||
+                document.querySelector(
+                  `[data-option-btn][data-code-second="${opt}"][id^="d_"]`,
+                ) ||
+                document.querySelector(
                   `[data-option-btn][data-code="${opt}"]`,
+                ) ||
+                document.querySelector(
+                  `[data-option-btn][data-code-second="${opt}"]`,
                 );
-              }
 
-              btn?.click();
+              // Guard against legacy links that list the same option twice
+              // (both its primary and second code) — clicking it again would
+              // toggle it back off.
+              if (btn && !clickedOptionBtns.has(btn)) {
+                clickedOptionBtns.add(btn);
+                btn.click();
+              }
             });
           } else {
             let btn = document.querySelector(
