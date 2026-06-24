@@ -337,6 +337,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "color-option-2-title",
         "color-option-2-subtitle-1",
         "color-option-2-colors-1",
+        "color-option-3-subtitle-2",
+        "color-option-3-colors-2",
         "color-option-2-subtitle-2",
         "color-option-2-colors-2",
       ],
@@ -344,8 +346,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "color-option-3-title",
         "color-option-3-subtitle-1",
         "color-option-3-colors-1",
-        "color-option-3-subtitle-2",
-        "color-option-3-colors-2",
       ],
       [
         "color-option-4-title",
@@ -381,26 +381,24 @@ document.addEventListener("DOMContentLoaded", () => {
         button.dataset["3dAction"] = "";
         button.dataset.fieldName = valueFieldName;
         button.dataset.value = `${groupName}: ${color["color-name"]}`;
-        button.id = `${color["color-id"]}`;
+        button.id = `${color["color-id"] || ""}`;
 
         const deactivateColors = color["deactivate-colors"];
         if (Array.isArray(deactivateColors) && deactivateColors.length > 0) {
-          deactivateColors.forEach((color) => {
-            const ids = deactivateColors
-              .map((c) => c["color-id"])
-              .filter(Boolean);
+          const ids = deactivateColors
+            .map((c) => c["color-id"])
+            .filter(Boolean);
+          if (ids.length) {
             button.dataset.deactivateColors = ids.join(", ");
-          });
+          }
         }
 
         const relatedOptions = color["related-options"];
         if (Array.isArray(relatedOptions) && relatedOptions.length > 0) {
-          relatedOptions.forEach((color) => {
-            const ids = relatedOptions
-              .map((c) => c["button-id"])
-              .filter(Boolean);
+          const ids = relatedOptions.map((c) => c["button-id"]).filter(Boolean);
+          if (ids.length) {
             button.dataset.relatedOptions = ids.join(", ");
-          });
+          }
         }
 
         const colorWrap = document.createElement("span");
@@ -416,22 +414,18 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           if (color["color-1"]) {
             const color1 = document.createElement("span");
-            if (color["colors-divider"]) {
-              color1.className = "options_color-btn_color-1 with-divider";
-            } else {
-              color1.className = "options_color-btn_color-1";
-            }
+            color1.className = color["colors-divider"]
+              ? "options_color-btn_color-1 with-divider"
+              : "options_color-btn_color-1";
             color1.style.backgroundColor = color["color-1"];
             colorWrap.appendChild(color1);
           }
 
           if (color["color-2"]) {
             const color2 = document.createElement("span");
-            if (color["colors-divider"]) {
-              color2.className = "options_color-btn_color-2 with-divider";
-            } else {
-              color2.className = "options_color-btn_color-2";
-            }
+            color2.className = color["colors-divider"]
+              ? "options_color-btn_color-2 with-divider"
+              : "options_color-btn_color-2";
             color2.style.backgroundColor = color["color-2"];
             colorWrap.appendChild(color2);
           }
@@ -461,6 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const total = colorsArray.length;
       const divisor = window.innerWidth < 390 ? 5 : 6;
       const remainder = total % divisor;
+
       if (remainder !== 0) {
         const fillersNeeded = divisor - remainder;
         for (let i = 0; i < fillersNeeded; i++) {
@@ -473,106 +468,98 @@ document.addEventListener("DOMContentLoaded", () => {
       return controls;
     }
 
-    optionItemsData.forEach(
-      (
-        [titleKey, subTitleOneKey, colorsOneKey, subTitleTwoKey, colorsTwoKey],
-        index,
-      ) => {
-        const title = boatData[titleKey];
-        const subTitleOne = boatData[subTitleOneKey];
-        const colorsOne = boatData[colorsOneKey];
-        const subTitleTwo = boatData[subTitleTwoKey];
-        const colorsTwo = boatData[colorsTwoKey];
+    optionItemsData.forEach((groupData, index) => {
+      const [titleKey, ...restKeys] = groupData;
+      const title = boatData[titleKey];
 
-        // Точна перевірка наявності контенту для групи
-        const hasContent =
-          title ||
-          (subTitleOne && subTitleOne.trim()) ||
-          (Array.isArray(colorsOne) && colorsOne.length > 0) ||
-          (subTitleTwo && subTitleTwo.trim()) ||
-          (Array.isArray(colorsTwo) && colorsTwo.length > 0);
+      const groups = [];
 
-        if (hasContent) {
-          const item = document.createElement("div");
-          item.dataset.optionsItem = "";
-          item.className = "options_item";
+      for (let i = 0; i < restKeys.length; i += 2) {
+        const subTitleKey = restKeys[i];
+        const colorsKey = restKeys[i + 1];
 
-          if (index === 0) {
-            item.classList.add("is-active");
-          }
+        if (!subTitleKey || !colorsKey) continue;
 
-          let wrapper;
+        const subTitle = boatData[subTitleKey];
+        const colors = boatData[colorsKey];
 
-          if (title) {
-            const h2 = document.createElement("h2");
-            h2.className = "options_title is-main";
-            h2.innerHTML = title;
-            item.appendChild(h2);
+        const hasGroupContent =
+          (subTitle && subTitle.trim()) ||
+          (Array.isArray(colors) && colors.length > 0);
 
-            const button = document.createElement("button");
-            button.type = "button";
-            button.dataset.navBtn = "";
-            button.className = "nav_btn";
-
-            if (index === 0) {
-              button.classList.add("is-active");
-            }
-
-            button.innerHTML = `
-                            <span class="nav_btn_caption-visible">${title}</span>
-                            <span class="nav_btn_caption-base">${title}</span>
-                            <span class="nav_btn_line"></span>
-                        `;
-
-            colorNavFragment.appendChild(button);
-
-            wrapper = document.createElement("div");
-            wrapper.className = "options_controls_wrapper";
-            item.appendChild(wrapper);
-          }
-
-          if (subTitleOne) {
-            const h3 = document.createElement("h3");
-            h3.className = "options_title";
-            h3.textContent = subTitleOne;
-            wrapper.appendChild(h3);
-          }
-
-          if (Array.isArray(colorsOne) && colorsOne.length > 0) {
-            const groupNameOne = subTitleOne
-              ? title + " | " + subTitleOne
-              : title;
-            const controls = renderColorControls(
-              colorsOne,
-              groupNameOne,
-              index + 1,
-              1,
-            );
-            wrapper.appendChild(controls);
-          }
-
-          if (subTitleTwo) {
-            const h3 = document.createElement("h3");
-            h3.className = "options_title";
-            h3.textContent = subTitleTwo;
-            wrapper.appendChild(h3);
-          }
-
-          if (Array.isArray(colorsTwo) && colorsTwo.length > 0) {
-            const groupNameTwo = subTitleTwo ? title + " | " + subTitleTwo : "";
-            const controls = renderColorControls(
-              colorsTwo,
-              groupNameTwo,
-              index + 1,
-              2,
-            );
-            wrapper.appendChild(controls);
-          }
-
-          colorOptionsFragment.appendChild(item);
+        if (hasGroupContent) {
+          groups.push({
+            subTitle,
+            colors,
+            subgroupIndex: groups.length + 1,
+          });
         }
-      },
-    );
+      }
+
+      const hasContent = title || groups.length > 0;
+
+      if (!hasContent) return;
+
+      const item = document.createElement("div");
+      item.dataset.optionsItem = "";
+      item.className = "options_item";
+
+      if (index === 0) {
+        item.classList.add("is-active");
+      }
+
+      let wrapper = null;
+
+      if (title) {
+        const h2 = document.createElement("h2");
+        h2.className = "options_title is-main";
+        h2.innerHTML = title;
+        item.appendChild(h2);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.navBtn = "";
+        button.className = "nav_btn";
+
+        if (index === 0) {
+          button.classList.add("is-active");
+        }
+
+        button.innerHTML = `
+          <span class="nav_btn_caption-visible">${title}</span>
+          <span class="nav_btn_caption-base">${title}</span>
+          <span class="nav_btn_line"></span>
+        `;
+
+        colorNavFragment.appendChild(button);
+
+        wrapper = document.createElement("div");
+        wrapper.className = "options_controls_wrapper";
+        item.appendChild(wrapper);
+      }
+
+      groups.forEach(({ subTitle, colors, subgroupIndex }) => {
+        if (subTitle) {
+          const h3 = document.createElement("h3");
+          h3.className = "options_title";
+          h3.textContent = subTitle;
+          wrapper.appendChild(h3);
+        }
+
+        if (Array.isArray(colors) && colors.length > 0) {
+          const groupName = subTitle ? `${title} | ${subTitle}` : title;
+          const controls = renderColorControls(
+            colors,
+            groupName,
+            index + 1,
+            subgroupIndex,
+          );
+          wrapper.appendChild(controls);
+        }
+      });
+
+      colorOptionsFragment.appendChild(item);
+    });
 
     navComponent.insertBefore(colorNavFragment, navComponent.firstChild);
     optionItems.insertBefore(colorOptionsFragment, optionItems.firstChild);
@@ -659,26 +646,18 @@ document.addEventListener("DOMContentLoaded", () => {
       mainBtn.textContent = title;
 
       if (Array.isArray(filterColors) && filterColors.length > 0) {
-        filterColors.forEach((color) => {
-          const ids = filterColors.map((c) => c["color-id"]).filter(Boolean);
-          mainBtn.dataset.setColor = ids.join(", ");
-        });
+        const ids = filterColors.map((c) => c["color-id"]).filter(Boolean);
+        mainBtn.dataset.setColor = ids.join(", ");
       }
 
       if (Array.isArray(mutualOption) && mutualOption.length > 0) {
-        mutualOption.forEach((option) => {
-          const ids = mutualOption.map((o) => o["button-id"]).filter(Boolean);
-          mainBtn.dataset.mutualOption = ids.join(", ");
-        });
+        const ids = mutualOption.map((o) => o["button-id"]).filter(Boolean);
+        mainBtn.dataset.mutualOption = ids.join(", ");
       }
 
       if (Array.isArray(activatorOption) && activatorOption.length > 0) {
-        activatorOption.forEach((option) => {
-          const ids = activatorOption
-            .map((o) => o["button-id"])
-            .filter(Boolean);
-          mainBtn.dataset.activatorOption = ids.join(", ");
-        });
+        const ids = activatorOption.map((o) => o["button-id"]).filter(Boolean);
+        mainBtn.dataset.activatorOption = ids.join(", ");
         mainBtn.classList.add("is-disabled");
       }
 
@@ -686,19 +665,15 @@ document.addEventListener("DOMContentLoaded", () => {
         Array.isArray(secondCodeActivator) &&
         secondCodeActivator.length > 0
       ) {
-        secondCodeActivator.forEach((option) => {
-          const ids = secondCodeActivator
-            .map((o) => o["button-id"])
-            .filter(Boolean);
-          mainBtn.dataset.secondCodeActivator = ids.join(", ");
-        });
+        const ids = secondCodeActivator
+          .map((o) => o["button-id"])
+          .filter(Boolean);
+        mainBtn.dataset.secondCodeActivator = ids.join(", ");
       }
 
       if (Array.isArray(relatedOpts) && relatedOpts.length > 0) {
-        relatedOpts.forEach((option) => {
-          const ids = relatedOpts.map((o) => o["button-id"]).filter(Boolean);
-          mainBtn.dataset.related = ids.join(", ");
-        });
+        const ids = relatedOpts.map((o) => o["button-id"]).filter(Boolean);
+        mainBtn.dataset.related = ids.join(", ");
       }
 
       const has2d = !!image2d;
@@ -758,52 +733,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Run Global Functions
     globalFuncs();
-    check3DModelLoading();
+
+    // UI is now built — mark ready, start the 3D model (its iframe was held
+    // back via data-src until the option buttons existed), and initialize if
+    // the model already loaded.
+    uiReady = true;
+    start3DModel();
+    maybeInitialize();
   }
 
   if (!document.body.hasAttribute("data-no-fetch")) {
+    // Attach the VERGE3D_LOADED listener BEFORE the fetch, so a 3D model that
+    // finishes loading before the (cold) fetch completes can never be missed.
+    setup3DModelListener();
     fetchDataSequentially();
+
+    // Safety net: if the UI build never completes (data error / very slow
+    // fetch), start the 3D anyway so the model isn't blocked forever. On the
+    // happy path the model already started at UI-build time, so this is a no-op.
+    setTimeout(() => {
+      if (!uiReady) start3DModel();
+    }, 30000);
   }
   // End of Get Boat Data
 
   //3D Model Loading Check
+  let vergeLoaded = false;
+  let uiReady = false;
+  let initialized = false;
+
   function finalizeUISetup() {
     hiddenUIElements.forEach((el) => el?.classList.remove("is-hidden"));
     updateCurrentOptionsStyles();
   }
 
-  function check3DModelLoading() {
-    const iframe = document.querySelector(".model_component");
-    if (!iframe) {
-      console.warn("iframe not found");
-      return;
-    }
+  // Runs once, only after BOTH the 3D model has loaded and the UI is built.
+  function maybeInitialize() {
+    if (initialized || !vergeLoaded || !uiReady) return;
+    initialized = true;
+    applyInitialState();
+    finalizeUISetup();
+  }
 
-    let handled = false;
-
-    function handleMessage(event) {
+  function setup3DModelListener() {
+    window.addEventListener("message", (event) => {
       if (event.data?.type !== "VERGE3D_LOADED") return;
-      if (handled) return;
+      vergeLoaded = true;
+      maybeInitialize();
+    });
 
-      handled = true;
-      console.log("3D has loaded");
-
-      window.removeEventListener("message", handleMessage);
-      clearTimeout(timeoutid);
-
-      console.log("Applying initial state");
-      applyInitialState();
-
-      finalizeUISetup();
-    }
-
-    window.addEventListener("message", handleMessage);
-
-    const timeoutid = setTimeout(() => {
-      if (handled) return;
-      console.warn("Timeout waiting for VERGE3D_LOADED");
-      window.removeEventListener("message", handleMessage);
+    setTimeout(() => {
+      if (!vergeLoaded) {
+        console.warn("Timeout waiting for VERGE3D_LOADED");
+      }
     }, 60000);
+  }
+
+  // Start the 3D model by promoting the iframe's data-src → src. Held back so
+  // the browser does NOT load Verge3D during HTML parse: it must init only
+  // AFTER the option buttons exist with their final d_/e_ ids, otherwise it
+  // binds to a not-yet-built DOM and ignores clicks (the cold-load race).
+  function start3DModel() {
+    if (!modelIframe) return;
+    const src = modelIframe.dataset.src;
+    // Nothing to do if the iframe still uses a static `src`, or already started.
+    if (!src || modelIframe.getAttribute("src")) return;
+    modelIframe.setAttribute("src", src);
   }
 
   // End of 3D Model Loading Check
@@ -849,7 +844,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         currentId &&
         !currentId.startsWith("d_") &&
-        !currentId.startsWith("e_")
+        !currentId.startsWith("e_") &&
+        currentId !== "tube_color_off_white_hypalon" &&
+        currentId !== "bowrailing"
       ) {
         el.id = "d_" + currentId;
       }
@@ -1930,8 +1927,6 @@ document.addEventListener("DOMContentLoaded", () => {
           quality
         });
 
-        console.log("try:", quality, maxWidth, compressed.length);
-
         if (compressed.length <= maxLength) {
           return compressed;
         }
@@ -2071,8 +2066,6 @@ document.addEventListener("DOMContentLoaded", () => {
           maxHeight,
           quality,
         });
-
-        console.log("try:", quality, maxWidth, compressed.length);
 
         if (compressed.length <= maxLength) {
           return compressed;
