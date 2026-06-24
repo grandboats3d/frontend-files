@@ -1,3 +1,4 @@
+// Build: 2026-06-24 19:19
 document.addEventListener("DOMContentLoaded", () => {
   // GSAP Defaults
   const defaultDuration = 0.2;
