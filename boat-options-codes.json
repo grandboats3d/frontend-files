@@ -299,7 +299,7 @@
     "overpressure_valves": { "code": "414602" }
   },
 
-  "d950-adventure": {
+  "d950-dive": {
     "suspension_sports_seat": { "code": "230005" },
     "double_seat_leaning": { "code": "230007" },
     "diving_platform_wladder": { "code": "255701" },
@@ -324,7 +324,7 @@
     "overpressure_valves": { "code": "414602" }
   },
   
-  "d950drive": {
+  "d950-Adventure": {
     "suspension_sports_seat": { "code": "230005" },
     "double_seat_leaning": { "code": "230007" },
     "waterski_mast_d950_handrails": { "code": "2544" },
